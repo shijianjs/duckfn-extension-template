@@ -102,6 +102,21 @@ just build_wasm
 wasm 构建走 `src/wasm_lib.rs`（`src/lib.rs` 的 `staticlib` 镜像），两个 crate root 必须始终声明同一组
 `mod`。
 
+## 文档站
+
+仓库里带着一个 [Docusaurus](https://docusaurus.io/) 站点（`docs/`），中英双语，并且有工作流在每次版本
+tag 时把它发布到 GitHub Pages：
+
+```shell
+just docs_install    # 只做一次
+just docs_start      # 本地预览 http://localhost:3000
+just docs_build      # 真正该跑的那一条：onBrokenLinks 设为 throw，链接断了就构建失败
+```
+
+模板里的页面写的是示例函数；你的 API 长出自己的样子之后，把这些页面（以及 `docs/i18n/zh-Hans/` 下的译文）
+改掉，或者直接删掉 `docs/` —— 仓库里没有别的东西依赖它。约定（目录、命令、翻译流程、部署、
+`{{EXTENSION_VERSION}}` 版本占位符）写在 [`docs/README.md`](docs/README.md) 里。
+
 ## 安装已发布的扩展
 
 发布物是 GitHub Release 上各平台构建出的 `.duckdb_extension` 文件：
@@ -122,5 +137,6 @@ LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-wi
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | 约定、duckfn 知识地图、发版流程 |
 | [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md) | 目录结构、骨架取舍、构建与测试、函数描述导出 |
+| [docs/README.md](docs/README.md) | 文档站：目录、命令、翻译流程、部署 |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | 同上，英文 |
 | [README.md](README.md) | 本文件，英文 |

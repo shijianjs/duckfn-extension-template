@@ -35,6 +35,7 @@ scripts/release.sh      发版（bump / tag / dev）
 scripts/rename.sh       克隆后改扩展名
 Justfile                日常迭代与发版的快捷入口
 AGENTS.md               约定 + 发版流程 + duckfn 知识地图
+docs/                   文档站（Docusaurus，中英双语）—— 不需要可整个删掉
 community-extension/    社区扩展注册的两份文件与流程说明
 ```
 
@@ -151,7 +152,7 @@ make debug       # -> build/debug/extension/my_extension/my_extension.duckdb_ext
 `make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
 
 仓库根目录的 `Justfile` 把两者都包了一层：`just build`、`just sql "SELECT …"`、`just repl`、
-`just test`、`just lint`、`just build_wasm`、`just docs_csv`。
+`just test`、`just lint`、`just build_wasm`、`just docs_csv`、`just docs_build`。
 
 有一条容易踩的坑：**产物文件名必须是 `<扩展名>.duckdb_extension`**。DuckDB 是按文件名去找入口点符号
 的，改个名字（比如从 `my_extension.duckdb_extension` 改成 `win.duckdb_extension`）就会报
@@ -191,6 +192,24 @@ cargo run --bin duckfn -- function_descriptions --all    # -> target/function_de
 
 要发社区扩展时，把这份 CSV 复制成 `community-extension/docs/function_descriptions.csv`
 （字段与流程见 [community-extension/AGENTS.md](community-extension/AGENTS.md)）。
+
+## 文档站（`docs/`）
+
+`docs/` 是一份 Docusaurus 站点，中英双语，与扩展本体互不依赖：不用就整个目录删掉，连带
+`.github/workflows/DeployDocs.yml` 与 Justfile 里的 `docs_*` recipe。
+
+```shell
+just docs_install    # 只做一次（等价 cd docs && npm install）
+just docs_start      # 本地预览 http://localhost:3000
+just docs_build      # 构建；也是「链接有没有断」的检查（onBrokenLinks 设为 throw）
+```
+
+站点自身的维护（目录、翻译流程、部署、克隆后要改哪几处）见 `docs/README.md`。这里只说与发版相关的两条：
+
+- 正文里的版本号一律写占位符 `{{EXTENSION_VERSION}}`（放进代码块或行内代码），构建期从
+  `docs/extension-version.ts` 替换；`scripts/release.sh bump` 会连带更新那个文件，所以发版不用动 markdown。
+- `scripts/release.sh` 的批量替换把 `docs/package-lock.json`、`docs/docs`、`docs/i18n` 排除在外（前者的
+  版本号是依赖自己的，后两者只写占位符），并在替换阶段单独改 `docs/extension-version.ts`。
 
 ## 测试
 

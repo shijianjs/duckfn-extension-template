@@ -38,6 +38,7 @@ scripts/release.sh      releasing (bump / tag / dev)
 scripts/rename.sh       renaming the extension after cloning
 Justfile                shortcuts for the daily loop and for releasing
 AGENTS.md               conventions + release flow + the duckfn knowledge map
+docs/                   the documentation site (Docusaurus, English + Simplified Chinese)
 community-extension/    the two files a community-extension registration needs, plus the process
 ```
 
@@ -171,7 +172,7 @@ make debug       # -> build/debug/extension/my_extension/my_extension.duckdb_ext
 `make release` is the optimized version of the same flow. On Windows `make` has to run inside Git Bash.
 
 The `Justfile` at the repository root wraps both: `just build`, `just sql "SELECT …"`, `just repl`,
-`just test`, `just lint`, `just build_wasm`, `just docs_csv`.
+`just test`, `just lint`, `just build_wasm`, `just docs_csv`, `just docs_build`.
 
 One easy trap: **the artifact file name must be `<extension name>.duckdb_extension`**. DuckDB looks the
 entry-point symbol up by that name, so a rename (from `my_extension.duckdb_extension` to
@@ -215,6 +216,28 @@ statement per entry. The text is **English** — it is pasted into that page as 
 To publish as a community extension, copy this CSV to
 `community-extension/docs/function_descriptions.csv` (fields and process in
 [community-extension/AGENTS.md](community-extension/AGENTS.md)).
+
+## Documentation site (`docs/`)
+
+`docs/` is a Docusaurus site in English and Simplified Chinese. Nothing else depends on it: delete the
+directory (together with `.github/workflows/DeployDocs.yml` and the Justfile's `docs_*` recipes) if you
+do not want a site.
+
+```shell
+just docs_install    # once (that is `cd docs && npm install`)
+just docs_start      # dev server at http://localhost:3000
+just docs_build      # the build, and the "are any links broken?" check (onBrokenLinks is `throw`)
+```
+
+Maintaining the site itself — layout, translation workflow, deployment, what to change after cloning —
+is in `docs/README.md`. Only two things here touch the release flow:
+
+- Version numbers in the pages are written as the `{{EXTENSION_VERSION}}` placeholder (inside a code
+  block or inline code) and substituted at build time from `docs/extension-version.ts`; `scripts/release.sh
+  bump` updates that file, so a release never has to touch markdown.
+- The bulk replacement in `scripts/release.sh` skips `docs/package-lock.json`, `docs/docs` and
+  `docs/i18n` (the lock file's versions belong to the dependencies; the pages only hold placeholders) and
+  replaces `docs/extension-version.ts` separately.
 
 ## Tests
 

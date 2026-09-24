@@ -105,6 +105,22 @@ just build_wasm
 The wasm build uses `src/wasm_lib.rs` (a `staticlib` mirror of `src/lib.rs`); the two crate roots must
 always declare the same set of `mod`s.
 
+## Documentation site
+
+The repository carries a [Docusaurus](https://docusaurus.io/) site in `docs/`, in English and
+Simplified Chinese, with a workflow that publishes it to GitHub Pages on every version tag:
+
+```shell
+just docs_install    # once
+just docs_start      # dev server at http://localhost:3000
+just docs_build      # the check that matters: onBrokenLinks is set to throw
+```
+
+The template's pages describe the sample functions; rewrite them (and their translations under
+`docs/i18n/zh-Hans/`) as your API grows, or delete `docs/` — nothing else depends on it. The
+conventions — layout, commands, translation workflow, deployment, the `{{EXTENSION_VERSION}}`
+version placeholder — are in [`docs/README.md`](docs/README.md).
+
 ## Installing the released extension
 
 Releases are GitHub Releases carrying the build matrices' `.duckdb_extension` files, one per platform:
@@ -125,5 +141,6 @@ makes it `INSTALL my_extension FROM community` instead; the two files that requi
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | conventions, the duckfn knowledge map, the release flow |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | directory layout, skeleton trade-offs, build & test, docs export |
+| [docs/README.md](docs/README.md) | the documentation site: layout, commands, translations, deployment |
 | [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md) | the same, in Chinese |
 | [README.zh.md](README.zh.md) | this file, in Chinese |

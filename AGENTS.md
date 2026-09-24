@@ -129,6 +129,19 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
 `overloads_name` 能把「同一名字下按参数个数/类型分派」的多个签名并成一个函数集，需要时再用
 （见 duckfn 的文档）。
 
+### 文档站（docs/）
+
+`docs/` 是一份 Docusaurus 站点（英文 + 简体中文），**不是必须的**：不用就整个目录删掉，仓库里只有两处
+引用它 —— `.github/workflows/DeployDocs.yml` 与 Justfile 的 `docs_*` recipe —— 一起删掉即可。
+
+维护约定（目录、命令、翻译流程、部署、版本占位符）见 [`docs/README.md`](docs/README.md)。两条容易踩的：
+
+- 正文里**不要手写版本号**：写 `{{EXTENSION_VERSION}}`（放在围栏代码块或行内代码里），构建期从
+  `docs/extension-version.ts` 替换。那个文件由 `just release_bump` 更新，是文档站版本号的唯一来源。
+- 译文要在 `docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/` 下按**同样的相对路径**放一份全文，
+  `id` / `slug` / `sidebar_position` 与英文页保持一致，页内链接用相对文件路径（写 `/docs/…` 会把中文页
+  送到英文页）。
+
 ### 社区扩展注册
 
 `community-extension/` 是向 [duckdb/community-extensions](https://github.com/duckdb/community-extensions)
@@ -204,6 +217,10 @@ just release_tag 0.1.0     # 打 tag v0.1.0，推送 main 与 tag
 推送 tag 触发 `.github/workflows/MainDistributionPipeline.yml`：为各平台构建扩展并跑测试，然后为该 tag
 创建（或更新）GitHub Release，把构建出的 `.duckdb_extension` 全部挂上去。推 main 本身不构建。
 
+同一个 tag 还会触发 `.github/workflows/DeployDocs.yml`，把 `docs/` 里的文档站构建后发布到 GitHub Pages
+（需要先在仓库 Settings → Pages → Build and deployment → Source 里选 **GitHub Actions**，一次性设置）。
+不需要文档站就把那个工作流与 `docs/` 一起删掉。
+
 ### 3. 等 CI 全绿
 
 ```bash
@@ -237,6 +254,7 @@ just release_dev 0.1.1-dev.0
 ## 相关文档
 
 - [`DEVELOPMENT.zh.md`](DEVELOPMENT.zh.md)（[英文](DEVELOPMENT.md)）：目录结构、骨架取舍、构建与测试。
+- [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
 - [`README.zh.md`](README.zh.md)（[英文](README.md)）：SQL 接口与使用说明。
 - [`scripts/release.sh`](scripts/release.sh) 与 [`scripts/rename.sh`](scripts/rename.sh)：
   `release_bump` / `release_dev` / `release_tag` 与改名的实际实现。
