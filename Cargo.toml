@@ -1,7 +1,14 @@
 [package]
-name = "rusty_quack"
+name = "my_extension"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.86"
+# 这是 DuckDB 的 loadable extension（靠 GitHub Release 上的 .duckdb_extension 分发，
+# 见根目录 AGENTS.md 的「发版流程」），不发 crates.io。
+#
+# A DuckDB loadable extension: it ships as the .duckdb_extension files attached to a GitHub Release
+# (see the release flow in AGENTS.md) and is never published to crates.io.
+publish = false
 
 [lib]
 crate-type = ["cdylib"]
@@ -11,13 +18,63 @@ lto = true
 strip = true
 
 [[example]]
-# crate-type can't be (at the moment) be overriden for specific targets
+# 目前无法按 target 覆盖 crate-type：src/wasm_lib.rs 转发到 src/lib.rs，
+# 这样原生编译保持 cdylib，Wasm 编译则用 staticlib（真正的链接由 emcc 完成）。
+# name 必须与扩展名一致（Justfile 的 build_wasm 拿它当 --example 的参数）。
+#
+# crate-type can't be (at the moment) be overriden for specific targets:
 # src/wasm_lib.rs forwards to src/lib.rs so that we can change from cdylib
 # (that is needed while compiling natively) to staticlib (needed since the
-# actual linking will be done via emcc
-name = "rusty_quack"
+# actual linking will be done via emcc).
+# The name must match the extension name (the Justfile's build_wasm passes it to `--example`).
+name = "my_extension"
 path = "src/wasm_lib.rs"
 crate-type = ["staticlib"]
 
 [dependencies]
-duckdb = { version = "~1.10505.0", features = ["loadable-extension", "vscalar"] }
+# duckfn：属性宏框架，把普通 Rust 函数变成 DuckDB 的标量 / 聚合 / 表函数等（见 src/extension/functions/）。
+# 打开的两个 feature：
+#   - duckdb-1-5：DuckDB 1.5 才进 C API 的能力（宿主文件系统 `duckfn::duck_vfs` 就在它下面，落盘读写的
+#     一行式封装在那里）。本模板的 Makefile 与 CI 都对准 v1.5.5，所以直接打开；确实不需要的项目可以去掉。
+#   - cli：src/bin/duckfn.rs 用的命令行工具（导出函数描述 CSV），给 duckfn 带上 clap 与 csv。
+#     不用 `just docs_csv` 的话可以去掉它，同时删掉 src/bin/duckfn.rs。
+#
+# duckfn: the attribute-macro framework that turns ordinary Rust functions into DuckDB scalar /
+# aggregate / table functions (see src/extension/functions/). Two features are on:
+#   - duckdb-1-5: what only reached DuckDB's C API in 1.5 (the host file system
+#     `duckfn::duck_vfs`, whose one-line read/write helpers live there). The Makefile and CI of this
+#     template both target v1.5.5, so it is on by default; drop it if you really do not need it.
+#   - cli: the command-line tool behind src/bin/duckfn.rs (exports the function-description CSV); it
+#     pulls clap and csv into duckfn. Drop it — and src/bin/duckfn.rs — if you never run `just docs_csv`.
+duckfn = { version = "0.0.10", features = ["duckdb-1-5", "cli"] }
+
+# duckfn 本身就建立在下面两个 crate 之上；需要直接使用它们的类型或 builder 时显式加上。
+# quack-rs：duckfn_entrypoint! 展开出的代码直接引用 `quack_rs::` 路径，必须显式依赖。
+#
+# duckfn is built on the two crates below; add them explicitly when you use their
+# types or builders directly.
+# quack-rs: the code expanded by `duckfn_entrypoint!` refers to `quack_rs::` paths,
+# so it must be a direct dependency.
+quack-rs = "0.16.0"
+
+# loadable-extension：走 DuckDB 的 API 函数表分发，而不是链接 libduckdb，这也是「无需在本地编译
+# DuckDB」的原因（仅使用头文件，不链接库）。版本下限是 DuckDB 1.5：libduckdb-sys 把 DuckDB 版本编码成
+# `1.<major*10000 + minor*100 + patch>.0`（1.5.0 → 1.10500.0，1.5.5 → 1.10505.0），
+# 于是 `>=1.10500` 就是「DuckDB >= 1.5」。
+#
+# `loadable-extension` dispatches through DuckDB's API table instead of linking libduckdb — that is what
+# keeps a local DuckDB build unnecessary (headers only). The lower bound is DuckDB 1.5: libduckdb-sys
+# encodes a DuckDB version as `1.<major*10000 + minor*100 + patch>.0` (1.5.0 → 1.10500.0,
+# 1.5.5 → 1.10505.0), so `>=1.10500` means "DuckDB >= 1.5".
+libduckdb-sys = { version = ">=1.10500, <2", features = ["loadable-extension"] }
+
+# 用到时间/日期（`DuckDate`、`DuckTimestamp*`…）或 UUID、DECIMAL 的互转时，再打开 duckfn 的对应
+# feature（"chrono" / "uuid" / "rust_decimal"），并把那个 crate 也加成依赖：duckfn 不 re-export 它们。
+# 例：
+#   duckfn = { version = "0.0.10", features = ["duckdb-1-5", "chrono", "cli"] }
+#   chrono = { version = "0.4", default-features = false, features = ["std"] }
+#
+# Enable duckfn's interop features ("chrono" / "uuid" / "rust_decimal") when you convert to those
+# types, and add the crate itself as a dependency too: duckfn re-exports none of them. For example:
+#   duckfn = { version = "0.0.10", features = ["duckdb-1-5", "chrono", "cli"] }
+#   chrono = { version = "0.4", default-features = false, features = ["std"] }

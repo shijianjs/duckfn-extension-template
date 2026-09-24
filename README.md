@@ -1,130 +1,129 @@
-# DuckDB Rust extension template
-This is an **experimental** template for Rust based extensions based on the C Extension API of DuckDB. The goal is to
-turn this eventually into a stable basis for pure-Rust DuckDB extensions that can be submitted to the Community extensions
-repository
+[English](README.md) | [简体中文](README.zh.md)
 
-Features:
-- No DuckDB build required
-- No C++ or C code required
-- CI/CD chain preconfigured
-- (Coming soon) Works with community extensions
+# my_extension
 
-## Cloning
+A DuckDB [loadable extension](https://duckdb.org/docs/stable/extensions/extension_development) written
+with [duckfn](https://crates.io/crates/duckfn): attribute macros turn ordinary Rust functions into DuckDB
+scalar / aggregate / table functions, and the C++ build is not involved at all (the C API is used
+headers-only, through DuckDB's API table).
 
-Clone the repo with submodules
+This repository is a **template**: [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template).
+It carries the full working loop — build, sqllogictest, docs export, release — around two sample
+functions, so a new extension starts from a green build instead of from an empty directory. A real
+extension written the same way: [duckfn_quantstats](https://github.com/shijianjs/duckfn-quantstats).
+
+## Starting a new extension from this template
 
 ```shell
-git clone --recurse-submodules <repo>
+git clone https://github.com/shijianjs/duckfn-extension-template my_new_extension
+cd my_new_extension
+rm -rf .git && git init    # optional: drop the template's history and start your own
+just rename my_new_extension
 ```
 
-## Dependencies
-In principle, these extensions can be compiled with the Rust toolchain alone. However, this template relies on some additional
-tooling to make life a little easier and to be able to share CI/CD infrastructure with extension templates for other languages:
+`just rename` (that is, `scripts/rename.sh`) rewrites every place the extension name has to match — the
+crate name and `[[example]] name`, `EXTENSION_NAME` in the Makefile, the entry-point symbol, the Justfile,
+the CI workflow and the docs — and regenerates the `Cargo.lock` entry. It ends by printing the few things
+left for a human, all of them listed in [DEVELOPMENT.md](DEVELOPMENT.md) (next steps) and
+[AGENTS.md](AGENTS.md) (conventions, including the `{{PROJECT_GOAL}}` / `{{DUCKFN_REPO}}` placeholders).
+Replacing the two sample functions with your own API is one of them.
 
-- Python3
-- Python3-venv
-- [Make](https://www.gnu.org/software/make)
-- Git
+## Quick start
 
-Installing these dependencies will vary per platform:
-- For Linux, these come generally pre-installed or are available through the distro-specific package manager.
-- For MacOS, [homebrew](https://formulae.brew.sh/).
-- For Windows, [chocolatey](https://community.chocolatey.org/).
-
-## Building
-After installing the dependencies, building is a two-step process. Firstly run:
 ```shell
-make configure
+cargo install cargo-duckdb-ext-tools   # once: a global cargo subcommand, no project dependency
+cargo duckdb-ext build                 # -> target/debug/my_extension.duckdb_extension
 ```
-This will ensure a Python venv is set up with DuckDB and DuckDB's test runner installed. Additionally, depending on configuration,
-DuckDB will be used to determine the correct platform for which you are compiling.
 
-Then, to build the extension run:
+Locally built extensions are unsigned, so DuckDB has to be started with `-unsigned`:
+
 ```shell
-make debug
-```
-This delegates the build process to cargo, which will produce a shared library in `target/debug/<shared_lib_name>`. After this step,
-a script is run to transform the shared library into a loadable extension by appending a binary footer. The resulting extension is written
-to the `build/debug` directory.
-
-To create optimized release binaries, simply run `make release` instead.
-
-### Running the extension
-To run the extension code, start `duckdb` with `-unsigned` flag. This will allow you to load the local extension file.
-
-```sh
-duckdb -unsigned
+duckdb -unsigned -c "
+LOAD './target/debug/my_extension.duckdb_extension';
+SELECT my_greet('world');
+-- Hello, world!
+SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
+-- 7.0
+"
 ```
 
-After loading the extension by the file path, you can use the functions provided by the extension. This template registers
-the `rusty_echo()` scalar function and the `rusty_quack()` table function.
+The `Justfile` wraps the same commands: `just build`, `just sql "SELECT my_greet('world')"`,
+`just repl` (a REPL with the extension already loaded).
 
-```sql
-LOAD './build/debug/extension/rusty_quack/rusty_quack.duckdb_extension';
-SELECT rusty_echo('Jane');
+## Functions
+
+Two sample functions, one per registration path. They are meant to be replaced — see
+`src/extension/functions/`.
+
+| Function | Kind | Input → output |
+| --- | --- | --- |
+| `my_greet(name)` | scalar | `VARCHAR` → `VARCHAR`, never NULL |
+| `my_greet_checked(name)` | scalar | `VARCHAR` → `VARCHAR`, `NULL` for an empty name, an error for surrounding whitespace |
+| `my_sum(value)` | aggregate | `DOUBLE` → `DOUBLE`, NULLs skipped, `NULL` for an empty group |
+
+Behaviour worth knowing, because it is duckfn's rule rather than this template's:
+
+- a non-`Option` argument short-circuits NULL to SQL NULL — the function body never runs for that row;
+  write the parameter as `Option<T>` to see the NULL and decide its meaning yourself;
+- `-> DuckOptionResult<T>` is how a scalar function returns NULL (`Ok(None)`) or fails the query (`Err`);
+- an aggregate is "a function with a `&mut` state parameter": the state's `Output` decides the SQL
+  return type, and `result` decides whether the group yields a value or NULL.
+
+## Build from source
+
+Two build paths, deliberately kept in sync:
+
+```shell
+cargo duckdb-ext build   # fast loop, no make; -> target/debug/my_extension.duckdb_extension
+make configure           # once: builds configure/venv (Python + the sqllogictest runner)
+make debug               # the official template path; -> build/debug/extension/my_extension/...
 ```
 
-```
-┌─────────────────────┐
-│ rusty_echo('Jane')  │
-│       varchar       │
-├─────────────────────┤
-│ 🐤 Jane 🦀 Jane     │
-└─────────────────────┘
-```
-
-```sql
-SELECT * FROM rusty_quack('Jane');
-```
-
-```
-┌─────────────────────┐
-│       column0       │
-│       varchar       │
-├─────────────────────┤
-│ Rusty Quack Jane 🐥 │
-└─────────────────────┘
-```
+`make release` is the optimized version of the same flow. On Windows `make` has to run inside Git Bash.
+The `Justfile` wraps both (`just build`, `just ci-build`, `just test`, `just ci-release`).
 
 ## Testing
-This extension uses the DuckDB Python client for testing. This should be automatically installed in the `make configure` step.
-The tests themselves are written in the SQLLogicTest format, just like most of DuckDB's tests. A sample test can be found in
-`test/sql/<extension_name>.test`. To run the tests using the *debug* build:
+
+Tests are SQLLogicTest files under `test/sql/`:
 
 ```shell
-make test_debug
+just test          # make configure + make debug + make test
+just ci-build      # just the official build, without running the tests
 ```
 
-or for the *release* build:
+`make test` does not rebuild, so run `just ci-build` (or `make debug`) first after touching Rust code.
+See [DEVELOPMENT.md](DEVELOPMENT.md) for the faster iteration loop (running the runner straight against
+`target/debug/*.duckdb_extension`) and for what the test files cover.
+
+## WebAssembly
+
 ```shell
-make test_release
+just config_env   # once: pin the toolchain and add the wasm target
+just build_wasm
 ```
 
-### Version switching
-Testing with different DuckDB versions is really simple:
+The wasm build uses `src/wasm_lib.rs` (a `staticlib` mirror of `src/lib.rs`); the two crate roots must
+always declare the same set of `mod`s.
 
-First, run
-```
-make clean_all
-```
-to ensure the previous `make configure` step is deleted.
+## Installing the released extension
 
-Then, run
-```
-DUCKDB_TEST_VERSION=v1.3.2 make configure
-```
-to select a different duckdb version to test with
+Releases are GitHub Releases carrying the build matrices' `.duckdb_extension` files, one per platform:
 
-Finally, build and test with
-```
-make debug
-make test_debug
-```
-
-### Known issues
-This is a bit of a footgun, but the extensions produced by this template may (or may not) be broken on windows on python3.11
-with the following error on extension load:
 ```shell
-IO Error: Extension '<name>.duckdb_extension' could not be loaded: The specified module could not be found
+duckdb -unsigned -c "
+LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension';
+"
 ```
-This was resolved by using python 3.12
+
+Publishing to DuckDB's [community extensions](https://duckdb.org/community_extensions/list_of_extensions)
+makes it `INSTALL my_extension FROM community` instead; the two files that requires are prepared in
+[`community-extension/`](community-extension/AGENTS.md).
+
+## Documentation
+
+| File | What is in it |
+| --- | --- |
+| [AGENTS.md](AGENTS.md) | conventions, the duckfn knowledge map, the release flow |
+| [DEVELOPMENT.md](DEVELOPMENT.md) | directory layout, skeleton trade-offs, build & test, docs export |
+| [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md) | the same, in Chinese |
+| [README.zh.md](README.zh.md) | this file, in Chinese |
