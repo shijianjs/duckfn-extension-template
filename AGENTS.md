@@ -21,14 +21,13 @@ AGENTS.md 模板（duckfn-extension-template 自带的那一份）：克隆模�
 
 ## 动手前先读
 
-**`{{DUCKFN_REPO}}/templates/duckfn-conventions.md`** —— 知识源（先读哪、再读哪）、
-硬约束、开发循环、新增函数的完整流程都在这份文件里。
+**`{{DUCKFN_REPO}}`** 是 duckfn 仓库在本机的 clone：用户文档、示例扩展与 sqllogictest 范例都在
+里面，而且都不会随依赖进入本项目（依赖包里只有 `src/` 与 `README.md`）。
 
-它由 duckfn 仓库维护，本文件**只引用、不复制**，所以 duckfn 升级时不需要重做本文件，
-只要 `git -C {{DUCKFN_REPO}} pull`（或 `checkout` 到对应 tag）。
+**铁律**：查不到就停下来问，不要凭印象编属性名、参数或返回类型。
 
-本机还没有 clone 时先来一份（文档、示例扩展、sqllogictest 范例都在里面，
-而且它们不会随依赖进入项目）：
+升级 duckfn 时只要 `git -C {{DUCKFN_REPO}} pull`（或 `checkout` 到对应 tag），本文件不用跟着重写。
+本机还没有 clone 时先来一份：
 
 ```shell
 git clone https://github.com/shijianjs/duckfn
@@ -38,7 +37,7 @@ git clone https://github.com/shijianjs/duckfn
 
 1. 改 `Cargo.toml` 里的 duckfn 版本，`cargo update -p duckfn -p duckfn-macro`。
 2. `git -C {{DUCKFN_REPO}} fetch --tags && git -C {{DUCKFN_REPO}} checkout v<新版本>`，
-   让文档与示例跟依赖对齐；约定文件随这次切换一起更新。
+   让文档与示例跟依赖对齐。
 3. 本文件不用改。
 
 ## 仓库约定

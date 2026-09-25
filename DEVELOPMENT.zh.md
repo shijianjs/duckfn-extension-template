@@ -7,7 +7,7 @@
 以及怎么构建与测试。
 
 duckfn 自身的通用约定（入口链路、新增函数的流程、动手前该查哪份源码）在这里**不重复**：
-它们在 [AGENTS.md](AGENTS.md) 里，由它指向 duckfn clone 里的 `templates/duckfn-conventions.md`。
+它们在 [AGENTS.md](AGENTS.md) 里，由它指向 duckfn 仓库在本机的 clone。
 
 本仓库是 [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template)，
 从 DuckDB 官方 [extension-template-rs](https://github.com/duckdb/extension-template-rs) 起步，

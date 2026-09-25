@@ -7,8 +7,8 @@ quick start. This file keeps what a user does not need — how the code is layer
 it does, which crate owns which part, and how to build and test.
 
 duckfn's own conventions (the entry-point chain, the process for adding a function, which source to
-read first) are **not** repeated here: they are in [AGENTS.md](AGENTS.md), which points at
-`templates/duckfn-conventions.md` inside a duckfn clone.
+read first) are **not** repeated here: they are in [AGENTS.md](AGENTS.md), which points at a local
+clone of the duckfn repository.
 
 This repository is [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template):
 it started from DuckDB's official
