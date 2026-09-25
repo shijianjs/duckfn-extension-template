@@ -57,9 +57,23 @@ community-extension/        社区扩展注册草稿
 ## 开发笔记在哪
 
 仓库自己的 `DEVELOPMENT.zh.md`（英文版 `DEVELOPMENT.md`）收着文档站不写的设计说明：为什么是两个
-crate root、聚合状态怎么工作、每个依赖为什么被选进来。
-`AGENTS.md` 里是约定与发版流程，并指向 duckfn 自己的指南 —— 属性宏能做的所有事都在那边：
+crate root、聚合状态怎么工作、每个依赖为什么被选进来。`AGENTS.md` 里是约定、发版流程，以及一份
+「duckfn 自己的文档按主题在哪儿」的对照表 —— 属性宏能做的所有事都在那边，不在本仓库里。
 
-- [duckfn 用户指南](https://shijianjs.github.io/duckfn/zh-Hans/) —— 属性、各类注册方式、类型映射、
-  自定义类型、错误处理。
-- [crates.io 上的 duckfn](https://crates.io/crates/duckfn) —— crate 本身。
+duckfn 0.0.11 起，那份指南连同**可运行的示例扩展**与它的 SQLLogicTest 用例都随 crate 一起发布，
+所以它们始终与 `Cargo.toml` 里的版本一致，也不需要 clone duckfn 的 git 仓库：
+
+```shell
+# 跑过一次构建之后：cargo 实际编译的那份源码
+ls -d ~/.cargo/registry/src/*/duckfn-*/
+```
+
+| 那个目录下的路径 | 是什么 |
+| --- | --- |
+| `docs/docs/**` | 用户指南正文（英文），含每类注册方式各一章。 |
+| `docs/i18n/zh-Hans/…/current/**` | 同一份指南的简体中文版。 |
+| `src/extension/**` | 示例扩展：每类注册方式一个文件，外加自定义类型与一个组合示例。 |
+| `test/sql/**` | 示例的 SQLLogicTest 用例，抄结构用。 |
+
+指南也有渲染好的在线版本 [shijianjs.github.io/duckfn/zh-Hans](https://shijianjs.github.io/duckfn/zh-Hans/)，
+但它可能比你的依赖新；registry 里那份才是本项目实际编译的代码。

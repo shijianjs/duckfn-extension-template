@@ -23,8 +23,8 @@ just rename my_new_extension
 `just rename`（即 `scripts/rename.sh`）会把扩展名必须一致的地方一次改齐 —— crate 名与
 `[[example]] name`、Makefile 的 `EXTENSION_NAME`、入口点符号、Justfile、CI 工作流，以及文档里的路径
 示例 —— 并按新包名重写 `Cargo.lock` 里那一条。脚本末尾会打印剩下需要人工过一遍的事情，清单在
-[DEVELOPMENT.zh.md](DEVELOPMENT.zh.md)（下一步）与 [AGENTS.md](AGENTS.md)（约定，含 `{{PROJECT_GOAL}}` /
-`{{DUCKFN_REPO}}` 两个占位符）里。把两个示例函数换成你自己的 API 就是其中一条。
+[DEVELOPMENT.zh.md](DEVELOPMENT.zh.md)（下一步）与 [AGENTS.md](AGENTS.md)（约定，含 `{{PROJECT_GOAL}}`
+占位符）里。把两个示例函数换成你自己的 API 就是其中一条。
 
 ## 快速上手
 

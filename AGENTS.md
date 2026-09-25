@@ -1,7 +1,6 @@
 <!--
-AGENTS.md 模板（duckfn-extension-template 自带的那一份）：克隆模板后**只改这一节**。
-把下面两个 {{...}} 填好，模板其余部分（约定与流程）不用动，它们对任何 duckfn 扩展都成立。
-填完**保留**这两行的形状（不是一次性的）：以后 clone 路径或项目目标变了，还在这里改。
+AGENTS.md（duckfn-extension-template 自带的那一份）：克隆模板后**只改下面「项目事实」里的
+{{PROJECT_GOAL}}**，其余部分（约定与流程）不用动，它们对任何 duckfn 扩展都成立。
 -->
 
 # AGENTS.md
@@ -11,7 +10,6 @@ AGENTS.md 模板（duckfn-extension-template 自带的那一份）：克隆模�
 ## 项目事实（唯一需要人维护的一段）
 
 - 这个扩展做什么：{{PROJECT_GOAL}}
-- duckfn 仓库在本机的 clone：`{{DUCKFN_REPO}}`
 - 本仓库来自 [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template)：
   克隆后第一件事是 `just rename <新扩展名>`（见下面「扩展名与改名」）。
 
@@ -21,24 +19,64 @@ AGENTS.md 模板（duckfn-extension-template 自带的那一份）：克隆模�
 
 ## 动手前先读
 
-**`{{DUCKFN_REPO}}`** 是 duckfn 仓库在本机的 clone：用户文档、示例扩展与 sqllogictest 范例都在
-里面，而且都不会随依赖进入本项目（依赖包里只有 `src/` 与 `README.md`）。
+**duckfn 的文档与示例随 crate 一起发布**（0.0.11 起）：跑过一次 `cargo build` 之后它们就在本机 cargo 的
+解包目录里，与 `Cargo.toml` 钉的版本严格对应 —— 不需要 clone duckfn 仓库，也不需要联网。
 
-**铁律**：查不到就停下来问，不要凭印象编属性名、参数或返回类型。
-
-升级 duckfn 时只要 `git -C {{DUCKFN_REPO}} pull`（或 `checkout` 到对应 tag），本文件不用跟着重写。
-本机还没有 clone 时先来一份：
-
-```shell
-git clone https://github.com/shijianjs/duckfn
+```powershell
+# Windows：版本号从 Cargo.toml 读（例如 0.0.11）
+Get-ChildItem "$env:CARGO_HOME\registry\src\*\duckfn-<版本>" -Directory | Select-Object -ExpandProperty FullName
 ```
+
+```bash
+# Linux / macOS
+ls -d ~/.cargo/registry/src/*/duckfn-*/
+```
+
+| 资源 | 路径（`<crate>` = 上面那个目录） |
+| --- | --- |
+| 示例扩展（各类注册方式都有可运行实现） | `<crate>/src/extension/**`：`functions/` 每类一个文件、`types/` 自定义类型、`demo/` 组合示例、`entry.rs` 入口 |
+| sqllogictest 范例（41 份 `.test`） | `<crate>/test/sql/**` |
+| 用户文档正文（英文） | `<crate>/docs/docs/**` |
+| 用户文档正文（简体中文） | `<crate>/docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/**` |
+| 一组可直接跑的 `just sql` 示例 | `<crate>/demo.sh` |
+
+按主题查表（路径都相对 `<crate>`）：
+
+| 主题 | 文档 | 参考实现 |
+| --- | --- | --- |
+| 示例扩展逐个功能讲解（先读它更快） | `docs/docs/examples/duckfn.md` | `src/extension/**`（`demo/` 是组合示例） |
+| 全部属性与参数 | `docs/docs/guide/attributes.md` | — |
+| 标量函数 | `docs/docs/guide/scalar-functions.md` | `src/extension/functions/scalar_function.rs` |
+| 聚合函数 | `docs/docs/guide/aggregate-functions.md` | `src/extension/functions/aggregate_function.rs` |
+| 表函数 | `docs/docs/guide/table-functions.md` | `src/extension/functions/table_function.rs`、`dynamic_table_function.rs` |
+| `COPY ... TO` / `FROM` | `docs/docs/guide/copy-functions.md` | `src/extension/functions/copy_function.rs`、`copy_from_function.rs` |
+| 类型转换 cast | `docs/docs/guide/casts.md` | `src/extension/functions/cast_function.rs` |
+| 替换扫描 | `docs/docs/guide/replacement-scans.md` | `src/extension/functions/replacement_scan.rs` |
+| SQL 宏 | `docs/docs/guide/sql-macros.md` | `src/extension/functions/sql_macro.rs`（脚本见 `src/extension/functions/sql/*.sql`） |
+| STRUCT / ENUM 等自定义类型 | `docs/docs/guide/custom-types.md` | `src/extension/types/duck_struct_scalar_echo.rs`、`duck_enum_echo.rs` |
+| Rust ↔ DuckDB 类型映射 | `docs/docs/guide/types.md` | `src/extension/types/**` |
+| 宿主文件系统（`duck_vfs`） | `docs/docs/guide/file-system.md` | `src/extension/functions/file_system.rs` |
+| 错误与 panic | `docs/docs/guide/errors-and-panics.md` | — |
+| 构建与发布 | `docs/docs/build-and-release.md` | — |
+| 排错 | `docs/docs/troubleshooting.md` | — |
+| 社区扩展文档页（`function_descriptions.csv`） | `docs/docs/community-extension-docs.md` | `src/extension/functions/*.rs`（带 `description` / `example` 的那几个） |
+
+属性宏接受哪些参数、允许哪些返回形状，**真相在 `duckfn-macro` 的源码里** —— 它是独立发布的 crate，
+解包在同一个 registry 目录下的 `duckfn-macro-<版本>/src/**`；文档与示例只覆盖常用面。
+
+在线版本（文档站 <https://shijianjs.github.io/duckfn/zh-Hans/>、API <https://docs.rs/duckfn>）随时可能是
+更新的一版，**与本机依赖冲突时以本地那份为准** —— 它就是实际编译的代码。
+
+**铁律**：任何来源都拿不到时，停下来告诉用户「我查不到 duckfn 的这部分 API」，
+不要凭记忆编属性名、参数或返回类型。写错的宏会以编译错误的形式暴露，
+但更常见的是一路编到底、最后没法编译。
 
 ## 升级 duckfn 时
 
 1. 改 `Cargo.toml` 里的 duckfn 版本，`cargo update -p duckfn -p duckfn-macro`。
-2. `git -C {{DUCKFN_REPO}} fetch --tags && git -C {{DUCKFN_REPO}} checkout v<新版本>`，
-   让文档与示例跟依赖对齐。
-3. 本文件不用改。
+2. `cargo build --all-targets` 跑一次：新版本的 crate 会被解包到 registry，文档、示例与 sqllogictest
+   范例随包而来，自动与依赖对齐 —— 不需要任何 git 操作。
+3. 本文件不用改：它只写占位符，不钉具体版本号。
 
 ## 仓库约定
 

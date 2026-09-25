@@ -108,7 +108,7 @@ echo "已改名的文件如上（共 ${#files[@]} 个）。还要手工过一遍
 echo "  1. 示例函数（my_greet / my_greet_checked / my_sum）与 test/sql/*.test —— 换成你自己的 API，"
 echo "     顺手把 AGENTS.md 里函数名前缀那条约定（默认 my_）改成你的前缀"
 echo "  2. community-extension/description.yml —— extension.name / description / maintainers / repo"
-echo "  3. AGENTS.md 的 {{PROJECT_GOAL}} 与 {{DUCKFN_REPO}} 两个占位符"
+echo "  3. AGENTS.md 的 {{PROJECT_GOAL}} 占位符"
 echo "  4. README / DEVELOPMENT 的说明文字（模板的来历、示例用法）"
 echo "  5. LICENSE 的版权人、Cargo.toml 的 duckfn 版本"
 echo

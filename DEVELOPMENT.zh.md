@@ -7,7 +7,8 @@
 以及怎么构建与测试。
 
 duckfn 自身的通用约定（入口链路、新增函数的流程、动手前该查哪份源码）在这里**不重复**：
-它们在 [AGENTS.md](AGENTS.md) 里，由它指向 duckfn 仓库在本机的 clone。
+它们在 [AGENTS.md](AGENTS.md) 里，那里也写明了 duckfn 的文档与示例扩展在本机 cargo registry 里的位置
+（0.0.11 起随 crate 发布，不需要 clone duckfn 仓库）。
 
 本仓库是 [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template)，
 从 DuckDB 官方 [extension-template-rs](https://github.com/duckdb/extension-template-rs) 起步，
@@ -254,8 +255,7 @@ make debug && make test    # make test 不会自动重新构建，改完 Rust �
 
 1. `just rename <新扩展名>` —— 改齐五处扩展名 + 文档，并把 `Cargo.lock` 重写；脚本末尾会打印其余
    需要人工过一遍的东西。
-2. `AGENTS.md`：填 `{{PROJECT_GOAL}}` 与 `{{DUCKFN_REPO}}` 两个占位符，顺手把函数名前缀那条约定里的
-   `my_` 改成你的前缀。
+2. `AGENTS.md`：填 `{{PROJECT_GOAL}}` 占位符，顺手把函数名前缀那条约定里的 `my_` 改成你的前缀。
 3. 示例函数（`my_greet` / `my_greet_checked` / `my_sum`）与 `test/sql/*.test` 换成你自己的 API。
 4. `community-extension/description.yml`：`extension.name` / `description` / `maintainers` / `repo`
    都要改成你的（字段依据见那一节）。

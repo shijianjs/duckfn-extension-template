@@ -46,7 +46,16 @@ crate-type = ["staticlib"]
 #     template both target v1.5.5, so it is on by default; drop it if you really do not need it.
 #   - cli: the command-line tool behind src/bin/duckfn.rs (exports the function-description CSV); it
 #     pulls clap and csv into duckfn. Drop it — and src/bin/duckfn.rs — if you never run `just docs_csv`.
-duckfn = { version = "0.0.10", features = ["duckdb-1-5", "cli"] }
+#
+# 0.0.11 起 duckfn 的用户文档正文、示例扩展与 sqllogictest 范例也随这个 crate 发布：跑过一次构建之后
+# 它们就在本机 cargo 的解包目录里（`<cargo>/registry/src/*/duckfn-<版本>/`），与这里钉的版本严格对应，
+# 不需要 clone duckfn 的 git 仓库。路径与按主题的对照表见 AGENTS.md。
+#
+# Since 0.0.11 the crate package also carries duckfn's user-guide text, the example extension and its
+# SQLLogicTest files: after any build they sit in cargo's unpacked source directory
+# (`<cargo>/registry/src/*/duckfn-<version>/`), matching the version pinned here — no duckfn repository
+# clone needed. AGENTS.md has the paths and a topic-by-topic map.
+duckfn = { version = "0.0.11", features = ["duckdb-1-5", "cli"] }
 
 # duckfn 本身就建立在下面两个 crate 之上；需要直接使用它们的类型或 builder 时显式加上。
 # quack-rs：duckfn_entrypoint! 展开出的代码直接引用 `quack_rs::` 路径，必须显式依赖。
@@ -71,10 +80,10 @@ libduckdb-sys = { version = ">=1.10500, <2", features = ["loadable-extension"] }
 # 用到时间/日期（`DuckDate`、`DuckTimestamp*`…）或 UUID、DECIMAL 的互转时，再打开 duckfn 的对应
 # feature（"chrono" / "uuid" / "rust_decimal"），并把那个 crate 也加成依赖：duckfn 不 re-export 它们。
 # 例：
-#   duckfn = { version = "0.0.10", features = ["duckdb-1-5", "chrono", "cli"] }
+#   duckfn = { version = "0.0.11", features = ["duckdb-1-5", "chrono", "cli"] }
 #   chrono = { version = "0.4", default-features = false, features = ["std"] }
 #
 # Enable duckfn's interop features ("chrono" / "uuid" / "rust_decimal") when you convert to those
 # types, and add the crate itself as a dependency too: duckfn re-exports none of them. For example:
-#   duckfn = { version = "0.0.10", features = ["duckdb-1-5", "chrono", "cli"] }
+#   duckfn = { version = "0.0.11", features = ["duckdb-1-5", "chrono", "cli"] }
 #   chrono = { version = "0.4", default-features = false, features = ["std"] }

@@ -25,7 +25,7 @@ just rename my_new_extension
 crate name and `[[example]] name`, `EXTENSION_NAME` in the Makefile, the entry-point symbol, the Justfile,
 the CI workflow and the docs — and regenerates the `Cargo.lock` entry. It ends by printing the few things
 left for a human, all of them listed in [DEVELOPMENT.md](DEVELOPMENT.md) (next steps) and
-[AGENTS.md](AGENTS.md) (conventions, including the `{{PROJECT_GOAL}}` / `{{DUCKFN_REPO}}` placeholders).
+[AGENTS.md](AGENTS.md) (conventions, including the `{{PROJECT_GOAL}}` placeholder).
 Replacing the two sample functions with your own API is one of them.
 
 ## Quick start

@@ -64,9 +64,25 @@ and the exported CSV comes out empty — silently.
 
 The repository's own `DEVELOPMENT.md` (and `DEVELOPMENT.zh.md`) carries the design notes the docs site
 does not: why there are two crate roots, how the aggregate state works, which dependencies were chosen
-and why. `AGENTS.md` holds the conventions and the release flow, and points at duckfn's own guide for
-everything the attribute macros can do:
+and why. `AGENTS.md` holds the conventions, the release flow and a topic-by-topic map of duckfn's own
+documentation — everything the attribute macros can do lives there, not in this repository.
 
-- [the duckfn user guide](https://shijianjs.github.io/duckfn/) — attributes, each registration kind,
-  type mapping, custom types, error handling.
-- [duckfn on crates.io](https://crates.io/crates/duckfn) — the crate itself.
+Since duckfn 0.0.11 that documentation, plus a runnable example extension and its SQLLogicTest files,
+ship **inside the crate package**, so they always match the version in `Cargo.toml` and need no clone of
+the duckfn repository:
+
+```shell
+# after any build: the sources cargo actually compiled against
+ls -d ~/.cargo/registry/src/*/duckfn-*/
+```
+
+| Path under that directory | What it is |
+| --- | --- |
+| `docs/docs/**` | The user guide's text (English), including the chapter per registration kind. |
+| `docs/i18n/zh-Hans/…/current/**` | The same guide in Simplified Chinese. |
+| `src/extension/**` | The example extension: one file per registration kind, plus custom types and a combined demo. |
+| `test/sql/**` | SQLLogicTest files for the example, worth copying the structure of. |
+
+The rendered guide is also online — [shijianjs.github.io/duckfn](https://shijianjs.github.io/duckfn/) —
+but it may be newer than your dependency; the copy in the registry is what this project is compiled
+against.

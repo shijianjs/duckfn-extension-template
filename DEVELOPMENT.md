@@ -7,8 +7,9 @@ quick start. This file keeps what a user does not need — how the code is layer
 it does, which crate owns which part, and how to build and test.
 
 duckfn's own conventions (the entry-point chain, the process for adding a function, which source to
-read first) are **not** repeated here: they are in [AGENTS.md](AGENTS.md), which points at a local
-clone of the duckfn repository.
+read first) are **not** repeated here: they are in [AGENTS.md](AGENTS.md), which also says where duckfn's
+documentation and example extension sit in the local cargo registry (they ship with the crate since
+0.0.11, so no duckfn clone is needed).
 
 This repository is [duckfn-extension-template](https://github.com/shijianjs/duckfn-extension-template):
 it started from DuckDB's official
@@ -284,8 +285,8 @@ Before committing: `cargo clippy --all-targets -- -D warnings` (`just lint`).
 
 1. `just rename <new-extension-name>` — rewrites the extension name in the five places plus the docs, and
    regenerates the `Cargo.lock` entry; the script ends by printing what still needs a human pass.
-2. `AGENTS.md`: fill in `{{PROJECT_GOAL}}` and `{{DUCKFN_REPO}}`, and change the `my_` prefix in the
-   naming convention to your own.
+2. `AGENTS.md`: fill in `{{PROJECT_GOAL}}`, and change the `my_` prefix in the naming convention to your
+   own.
 3. Replace the sample functions (`my_greet` / `my_greet_checked` / `my_sum`) and `test/sql/*.test` with
    your API.
 4. `community-extension/description.yml`: `extension.name` / `description` / `maintainers` / `repo` are
