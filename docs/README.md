@@ -18,24 +18,25 @@ if you would rather not have a site (nothing else in the repository depends on i
 | `docs/build-and-release.md` | The two build paths, the release flow, the wasm target. |
 | `docs/community-extension.md` | Publishing to DuckDB's community extensions. |
 | `i18n/zh-Hans/` | Simplified Chinese translations of all of the above, plus the UI strings. |
-| `src/pages/index.tsx` | Home page: hero, feature cards, the Rust/SQL showcase, and the "where to go next" cards. Every string is a `<Translate>` and has an entry in `i18n/zh-Hans/code.json` under `homepage.*`. |
-| `src/components/icons.tsx` | The home page's inline SVG glyphs (Lucide and Simple Icons paths, quoted at the top of the file) — an icon package would be the only new runtime dependency on the landing page. |
-| `src/css/custom.css` | Brand palette and theme overrides. The `--brand-*` tokens here are the single definition of the brand blue and accent yellow, so the home page never hard-codes a colour. |
+| `src/pages/index.tsx` | Home page: hero, feature cards, the Rust/SQL showcase and the "where to go next" cards. The hero, the feature grid and the next-step cards are `<dfk-*>` custom elements from [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit), mounted through callback refs and fed with the imperative `translate()` API; every string still has an entry in `i18n/zh-Hans/code.json` under `homepage.*`. The code showcase stays here because it needs the theme's `CodeBlock`. |
+| `src/pages/index.module.css` | The code showcase's styles. The hero, feature grid and cards carry their own styles inside the kit's shadow DOM, so they are not here. |
+| `src/css/custom.css` | Palette and theme overrides. It pulls the kit's global CSS in with `@import 'duckfn-docs-kit/src/kit.css'` (the `--duckfn-*` brand tokens and the TOC-toggle styles); this file itself only owns the Infima ramp. |
 | `static/` | Files copied to the site root (images, `favicon.ico`, `.nojekyll`). |
 | `sidebars.ts` | Sidebar definition. Categories come from `_category_.json`; order from `sidebar_position`. |
-| `docusaurus.config.ts` | Site configuration: `REPO_URL`, locales, navbar, footer, footer links. |
+| `docusaurus.config.ts` | Site configuration: `REPO_URL`, locales, navbar, footer, and the docs-kit plugins. |
 | `extension-version.ts` | The version shown in the docs. The only place it is written; `{{EXTENSION_VERSION}}` in the markdown is replaced from here at build time. |
-| `plugins/remark-extension-version.ts` | The remark plugin doing that replacement. |
 | `package.json` / `package-lock.json` | Dependencies. `package-lock.json` is committed: CI installs with `npm ci`. |
 
 ## What to change first
 
-1. `REPO_URL` in `docusaurus.config.ts` — the navbar, the footer and the home page all read it from
-   there (it is also handed to the home page as `customFields.repoUrl`).
+1. `REPO_URL` in `docusaurus.config.ts` — the navbar, the footer, the home page and the runnable
+   blocks' extension preload all read it from there (the home page also gets it as
+   `customFields.repoUrl`).
 2. `tagline` in `docusaurus.config.ts`, plus the copyright line in the footer and in
    `i18n/zh-Hans/docusaurus-theme-classic/footer.json`.
 3. The logo: `static/img/logo.svg` is a placeholder, and the brand palette in `src/css/custom.css` was
-   picked to match it — replace both together, or neither.
+   picked to match it — replace both together, or neither. The kit's `--duckfn-*` tokens (imported at
+   the top of that file) carry the same blue; override them there if your mark uses another colour.
 4. `static/img/docusaurus-social-card.jpg` (the preview image) and `static/img/favicon.ico`.
 5. The pages under `docs/docs/` and their translations under
    `i18n/zh-Hans/docusaurus-plugin-content-docs/current/`.
@@ -43,6 +44,84 @@ if you would rather not have a site (nothing else in the repository depends on i
    needs an index (https://docsearch.algolia.com/apply).
 7. One-time setup in the repository: Settings → Pages → Build and deployment → Source:
    **GitHub Actions**.
+
+## What duckfn-docs-kit provides
+
+The site is wired to [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit) instead of
+carrying its own copies of the same glue. `docusaurus.config.ts` registers four entry points and
+`src/css/custom.css` imports the fifth:
+
+| Entry point | What it does here |
+| --- | --- |
+| `duckfn-docs-kit/remark` | `remarkVersionPlaceholder` — replaces `{{EXTENSION_VERSION}}` at build time. |
+| `duckfn-docs-kit/sql/remark` | `remarkRunnableSql` — turns a runnable `sql` fence into a `<dfk-sql>` element. |
+| `duckfn-docs-kit/sql/extensions` | `dfkExtensions` — preloads the extension and injects the `dfk-*` element registration. |
+| `duckfn-docs-kit/toc-toggle/plugin` | `dfkTocToggle` — the TOC collapse control. |
+| `duckfn-docs-kit/src/kit.css` | The `--duckfn-*` brand tokens plus the styles a shadow boundary cannot host. |
+| `duckfn-docs-kit` (barrel) | The `<dfk-hero>` / `<dfk-features>` / `<dfk-next-steps>` home-page elements. |
+
+Because the two plugins inject their own browser glue, the site keeps **no `src/clientModules/` files
+of its own** (it used to have a hand-written TOC toggle), and there is no local `plugins/` directory
+either (it used to hold a copy of the version-placeholder remark plugin).
+
+## Runnable SQL blocks
+
+A fenced `sql` block whose info string is a JSON config turns into a live example: a CodeMirror
+editor with a Run button, running in DuckDB-Wasm in the reader's browser.
+
+````md
+```sql {"type":"duckfn","show":"table"}
+SELECT name, my_greet_checked(name) AS greeting
+FROM (VALUES ('world'), ('')) t(name);
+```
+````
+
+`"type":"duckfn"` is required; `show` is `table` (default), `text`, `html`, `iframe` or `svg`, and a
+block that demonstrates a failure declares `"expect":"error"` (see
+[intro.md](docs/intro.md) and [quick-start.md](docs/getting-started/quick-start.md) for the ones the
+template ships). The full config reference is in the kit's own guide at
+<https://shijianjs.github.io/duckfn/docs/docs-kit/runnable-sql>.
+
+## Preloaded extensions
+
+The blocks call the extension, so the extension has to be there before the first Run. That is the
+`dfkExtensions` plugin, configured in `docusaurus.config.ts`: on `npm start` / `npm run build` it
+fetches the repository's **latest release** asset
+`my_extension-wasm_eh.duckdb_extension.wasm` into
+`static/duckdb-extensions/my_extension.duckdb_extension.wasm`. The file name must keep `my_extension`
+before the first dot — that base is the entry symbol DuckDB looks up, hence the rename from the
+release asset, which carries the wasm suffix.
+
+Two consequences worth knowing:
+
+- **A release has to exist first.** Until you have tagged `v*.*.*` once, the plugin has nothing to
+  fetch and `npm run build` fails. While `REPO_URL` in `docusaurus.config.ts` is still the
+  `<owner>/<repo>` placeholder the preload list stays empty, so a fresh clone builds fine — the
+  blocks just cannot call the extension until you fill the URL in and cut a release. Note that on a
+  brand-new repository the **first** tag's Deploy Docs run can fail for the same reason: the release
+  is created by the *other* workflow the tag triggers, in parallel. Re-run Deploy Docs once the
+  release is up.
+- Downloads are cached under `.cache/duckfn-docs-kit/` and only re-fetched when the release asset's
+  sha256 changes; with a warm cache the build works offline. Both `.cache/` and
+  `static/duckdb-extensions/` are gitignored — a file placed there by hand needs `git add -f`.
+
+The extension is built by CI for DuckDB v1.5.5; the kit pins `@duckdb/duckdb-wasm` to the exact dev
+build whose engine matches. When either side moves, re-check that the live blocks still run.
+
+## Testing the examples
+
+`npm test` runs every runnable block in `docs/` and in each locale through DuckDB-Wasm and fails if
+one breaks, so an example cannot rot unnoticed:
+
+```shell
+npm test             # = duckfn-sql-verify --site . (needs the extension under static/duckdb-extensions/)
+```
+
+It preloads the same extension the page does and, like the page, runs one DuckDB instance per page
+with the page's blocks sharing a connection. It is **not** wired into CI: the test needs the wasm
+build of the extension, which only exists after a release, and the Deploy Docs workflow would race
+the release it depends on. Run it locally after a release, or from a checkout that already has the
+file under `static/duckdb-extensions/`.
 
 ## Commands
 
@@ -53,6 +132,7 @@ npm start -- --locale zh-Hans   # dev server, Chinese
 npm run build        # static site into build/
 npm run serve        # preview the build
 npm run typecheck    # tsc
+npm test             # run the runnable SQL blocks (see above)
 ```
 
 The `Justfile` wraps the first two (`just docs_build`, `just docs_start`) so the commands live next to
@@ -98,6 +178,8 @@ A translated page is a full copy of its English source, placed under
 - Keep `id`, `slug` and `sidebar_position` identical so both languages share routes and order.
 - Link to other pages with **relative file paths** (`./project-structure.md`, `../guide/functions.md`).
   A hard-coded `/docs/...` link would send a Chinese page to the English one.
+- Runnable blocks are copied verbatim except for the SQL comments: the `{"type":"duckfn",…}` info
+  string and the query itself are code, and `npm test` runs the Chinese page's blocks too.
 
 UI strings live in `i18n/zh-Hans/*.json`. After changing text in `docusaurus.config.ts`, in `src/`, or
 a `_category_.json`, regenerate the stubs and fill in the new entries:
@@ -113,3 +195,15 @@ statically, which is expected.
 
 Add another language by listing it in `i18n.locales` in `docusaurus.config.ts` and repeating the
 steps above.
+
+## Deployment
+
+Pushing a version tag (`v*.*.*`) builds the site and publishes it to GitHub Pages; the same workflow
+can be started by hand from the Actions tab.
+
+`url` and `baseUrl` are not hard-coded — the workflow reads them from `actions/configure-pages` and
+passes them to the build as `DOCS_URL` and `DOCS_BASE_URL`, which `docusaurus.config.ts` picks up.
+Outside CI they fall back to `http://localhost:3000` and `/`.
+
+One-time setup: in the repository settings, set **Pages → Build and deployment → Source** to
+**GitHub Actions**.

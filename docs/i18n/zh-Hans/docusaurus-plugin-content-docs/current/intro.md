@@ -29,10 +29,12 @@ fn my_greet_checked(name: String) -> DuckOptionResult<String> {
 }
 ```
 
-```sql
-LOAD './target/debug/my_extension.duckdb_extension';
-SELECT my_greet_checked('world');  -- Hello, world!
-SELECT my_greet_checked('');       -- NULL
+同一个函数的 SQL 一面。这个块会在你的浏览器里真跑：站点从仓库的最新 Release 预加载了这个扩展，
+所以这里不用写 `LOAD`。
+
+```sql {"type":"duckfn","show":"table"}
+SELECT name AS input, my_greet_checked(name) AS greeting
+FROM (VALUES ('world'), ('')) t(name);
 ```
 
 :::note[这些页面本身也是模板的一部分]

@@ -51,18 +51,26 @@ just repl           # 已经 LOAD 好扩展的 DuckDB REPL
 duckdb -unsigned -c "LOAD './target/debug/my_extension.duckdb_extension';"
 ```
 
-```sql
-SELECT my_greet('world');
--- Hello, world!
+下面是几个示例函数，就地就能跑 —— 站点从仓库的最新 Release 预加载了这个扩展，这里不用写 `LOAD`
+（本地自己构建的产物仍然要加 `-unsigned`，见下面的几个坑）。点任意块上的 **执行** 即可。
 
-SELECT my_greet_checked('');       -- NULL：空串不是错误……
-SELECT my_greet_checked(' x ');    -- ……但首尾空格是
+```sql {"type":"duckfn","show":"table"}
+SELECT name AS input, my_greet_checked(name) AS greeting
+FROM (VALUES ('world'), ('')) t(name);
+```
 
-SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
--- 7.0
+```sql {"type":"duckfn","show":"table"}
+-- my_sum 跳过 NULL；一组里一个有效值都没有时结果是 NULL 而不是 0。
+SELECT grp, my_sum(x) AS total
+FROM (VALUES ('rows', 1.5::DOUBLE), ('rows', 2.5), ('all NULL', NULL::DOUBLE)) t(grp, x)
+GROUP BY grp
+ORDER BY grp;
+```
 
-SELECT my_sum(x) FROM (VALUES (NULL::DOUBLE)) t(x);
--- NULL：空组返回 NULL，而不是 0
+失败路径同样是个可运行块 —— 它自己声明了「应该失败」：
+
+```sql {"type":"duckfn","expect":"error"}
+SELECT my_greet_checked(' x ');    -- 报错：首尾不允许有空格
 ```
 
 不进 REPL、只跑一条语句：

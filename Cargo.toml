@@ -33,19 +33,28 @@ crate-type = ["staticlib"]
 
 [dependencies]
 # duckfn：属性宏框架，把普通 Rust 函数变成 DuckDB 的标量 / 聚合 / 表函数等（见 src/extension/functions/）。
-# 打开的两个 feature：
+# 依赖用 `all`，一次带齐 duckfn 的全部功能（= duckdb-1-5 + owned-connection + cli + chrono + uuid
+# + rust_decimal），下游项目不必再逐个挑 feature：
 #   - duckdb-1-5：DuckDB 1.5 才进 C API 的能力（宿主文件系统 `duckfn::duck_vfs` 就在它下面，落盘读写的
-#     一行式封装在那里）。本模板的 Makefile 与 CI 都对准 v1.5.5，所以直接打开；确实不需要的项目可以去掉。
+#     一行式封装在那里）。本模板的 Makefile 与 CI 都对准 v1.5.5。
+#   - owned-connection：在扩展里自己开一条 DuckDB 连接（依赖 duckdb-1-5）。
 #   - cli：src/bin/duckfn.rs 用的命令行工具（导出函数描述 CSV），给 duckfn 带上 clap 与 csv。
-#     不用 `just docs_csv` 的话可以去掉它，同时删掉 src/bin/duckfn.rs。
+#     不用 `just docs_csv` 的话可以删掉 src/bin/duckfn.rs（feature 留着也无妨）。
+#   - chrono / uuid / rust_decimal：与 DuckDB 的 DATE/TIMESTAMP、UUID、DECIMAL 互转；用到时把对应
+#     的 crate 也加成直接依赖，duckfn 不 re-export 它们。
 #
 # duckfn: the attribute-macro framework that turns ordinary Rust functions into DuckDB scalar /
-# aggregate / table functions (see src/extension/functions/). Two features are on:
+# aggregate / table functions (see src/extension/functions/). The dependency turns on `all`, i.e. every
+# duckfn feature at once (= duckdb-1-5 + owned-connection + cli + chrono + uuid + rust_decimal), so a
+# downstream project never has to pick features one by one:
 #   - duckdb-1-5: what only reached DuckDB's C API in 1.5 (the host file system
 #     `duckfn::duck_vfs`, whose one-line read/write helpers live there). The Makefile and CI of this
-#     template both target v1.5.5, so it is on by default; drop it if you really do not need it.
+#     template both target v1.5.5.
+#   - owned-connection: open your own DuckDB connection from inside the extension (implies duckdb-1-5).
 #   - cli: the command-line tool behind src/bin/duckfn.rs (exports the function-description CSV); it
-#     pulls clap and csv into duckfn. Drop it — and src/bin/duckfn.rs — if you never run `just docs_csv`.
+#     pulls clap and csv into duckfn. Drop src/bin/duckfn.rs if you never run `just docs_csv`.
+#   - chrono / uuid / rust_decimal: conversions to and from DuckDB's DATE/TIMESTAMP, UUID and DECIMAL;
+#     add the crate itself as a direct dependency when you use one — duckfn re-exports none of them.
 #
 # 0.0.11 起 duckfn 的用户文档正文、示例扩展与 sqllogictest 范例也随这个 crate 发布：跑过一次构建之后
 # 它们就在本机 cargo 的解包目录里（`<cargo>/registry/src/*/duckfn-<版本>/`），与这里钉的版本严格对应，
@@ -55,7 +64,7 @@ crate-type = ["staticlib"]
 # SQLLogicTest files: after any build they sit in cargo's unpacked source directory
 # (`<cargo>/registry/src/*/duckfn-<version>/`), matching the version pinned here — no duckfn repository
 # clone needed. AGENTS.md has the paths and a topic-by-topic map.
-duckfn = { version = "0.0.11", features = ["duckdb-1-5", "cli"] }
+duckfn = { version = "0.0.14", features = ["all"] }
 
 # duckfn 本身就建立在下面两个 crate 之上；需要直接使用它们的类型或 builder 时显式加上。
 # quack-rs：duckfn_entrypoint! 展开出的代码直接引用 `quack_rs::` 路径，必须显式依赖。
@@ -77,13 +86,12 @@ quack-rs = "0.16.0"
 # 1.5.5 → 1.10505.0), so `>=1.10500` means "DuckDB >= 1.5".
 libduckdb-sys = { version = ">=1.10500, <2", features = ["loadable-extension"] }
 
-# 用到时间/日期（`DuckDate`、`DuckTimestamp*`…）或 UUID、DECIMAL 的互转时，再打开 duckfn 的对应
-# feature（"chrono" / "uuid" / "rust_decimal"），并把那个 crate 也加成依赖：duckfn 不 re-export 它们。
-# 例：
-#   duckfn = { version = "0.0.11", features = ["duckdb-1-5", "chrono", "cli"] }
+# 用到时间/日期（`DuckDate`、`DuckTimestamp*`…）或 UUID、DECIMAL 的互转时，直接把那个 crate 加成依赖即可
+# —— `all` 已经打开了 duckfn 的对应 feature（"chrono" / "uuid" / "rust_decimal"），而 duckfn 不
+# re-export 它们。例：
 #   chrono = { version = "0.4", default-features = false, features = ["std"] }
 #
-# Enable duckfn's interop features ("chrono" / "uuid" / "rust_decimal") when you convert to those
-# types, and add the crate itself as a dependency too: duckfn re-exports none of them. For example:
-#   duckfn = { version = "0.0.11", features = ["duckdb-1-5", "chrono", "cli"] }
+# When you convert to those types, just add the crate itself as a dependency: `all` has already turned
+# on duckfn's matching feature ("chrono" / "uuid" / "rust_decimal"), and duckfn re-exports none of
+# them. For example:
 #   chrono = { version = "0.4", default-features = false, features = ["std"] }

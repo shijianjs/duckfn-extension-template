@@ -171,13 +171,22 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
 `docs/` 是一份 Docusaurus 站点（英文 + 简体中文），**不是必须的**：不用就整个目录删掉，仓库里只有两处
 引用它 —— `.github/workflows/DeployDocs.yml` 与 Justfile 的 `docs_*` recipe —— 一起删掉即可。
 
-维护约定（目录、命令、翻译流程、部署、版本占位符）见 [`docs/README.md`](docs/README.md)。两条容易踩的：
+维护约定（目录、命令、翻译流程、部署、版本占位符）见 [`docs/README.md`](docs/README.md)。可复用的部件
+来自 npm 上的 [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit)（首页 `<dfk-*>` 组件、
+目录折叠控件、版本占位符 remark 插件、可运行 SQL 块），站点里不再留副本，注册处见 `docusaurus.config.ts`。
+三条容易踩的：
 
-- 正文里**不要手写版本号**：写 `{{EXTENSION_VERSION}}`（放在围栏代码块或行内代码里），构建期从
-  `docs/extension-version.ts` 替换。那个文件由 `just release_bump` 更新，是文档站版本号的唯一来源。
+- 正文里**不要手写版本号**：写 `{{EXTENSION_VERSION}}`（放在围栏代码块或行内代码里），构建期由 kit 的
+  `remarkVersionPlaceholder` 从 `docs/extension-version.ts` 替换。那个文件由 `just release_bump` 更新，
+  是文档站版本号的唯一来源。
 - 译文要在 `docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/` 下按**同样的相对路径**放一份全文，
   `id` / `slug` / `sidebar_position` 与英文页保持一致，页内链接用相对文件路径（写 `/docs/…` 会把中文页
-  送到英文页）。
+  送到英文页）。可运行块的 SQL 是代码，照抄，只翻注释。
+- **可运行 SQL 块**（info string 为 `{"type":"duckfn",…}` 的 `sql` 围栏）在浏览器里用 DuckDB-Wasm 真跑，
+  并调用本扩展 —— 扩展由 `dfkExtensions` 从仓库的**最新 Release** 预加载。因此**先有一次 tag/Release
+  才能 `npm run build`**（`REPO_URL` 还是占位符时不预加载，构建照常过）；`cd docs && npm test` 会把每个
+  块重跑一遍。不需要这套能力时，把 `docusaurus.config.ts` 里的 `remarkRunnableSql` 与 `dfkExtensions`
+  两行去掉即可。
 
 ### 社区扩展注册
 

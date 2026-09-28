@@ -205,7 +205,14 @@ just docs_start      # 本地预览 http://localhost:3000
 just docs_build      # 构建；也是「链接有没有断」的检查（onBrokenLinks 设为 throw）
 ```
 
-站点自身的维护（目录、翻译流程、部署、克隆后要改哪几处）见 `docs/README.md`。这里只说与发版相关的两条：
+站点自身的维护（目录、翻译流程、部署、克隆后要改哪几处）见 `docs/README.md`。那些可复用的部件 —— 首页
+的 `<dfk-*>` 组件、目录折叠控件、版本占位符 remark 插件、可运行 SQL 块 —— 都来自
+[`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit)（一个 npm 依赖），站点里不再留副本。
+页面上的 `sql {"type":"duckfn",…}` 块会在读者的浏览器里用 DuckDB-Wasm 真跑，并调用本扩展 —— 扩展由站点
+从仓库的最新 GitHub Release 预加载；`cd docs && npm test` 会把每个块重跑一遍。两者都要先有一次 Release，
+详见 `docs/README.md`。
+
+这里只说与发版相关的两条：
 
 - 正文里的版本号一律写占位符 `{{EXTENSION_VERSION}}`（放进代码块或行内代码），构建期从
   `docs/extension-version.ts` 替换；`scripts/release.sh bump` 会连带更新那个文件，所以发版不用动 markdown。

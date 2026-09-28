@@ -54,18 +54,27 @@ just repl           # a DuckDB REPL with the extension already loaded
 duckdb -unsigned -c "LOAD './target/debug/my_extension.duckdb_extension';"
 ```
 
-```sql
-SELECT my_greet('world');
--- Hello, world!
+The sample functions, running right here — the site preloads the extension from the repository's latest
+release, so no local `LOAD` is needed here (a hand-built extension still needs `-unsigned`; see the
+traps below). Click **Run** on any block.
 
-SELECT my_greet_checked('');       -- NULL: an empty name is not an error …
-SELECT my_greet_checked(' x ');    -- … but surrounding whitespace is
+```sql {"type":"duckfn","show":"table"}
+SELECT name AS input, my_greet_checked(name) AS greeting
+FROM (VALUES ('world'), ('')) t(name);
+```
 
-SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
--- 7.0
+```sql {"type":"duckfn","show":"table"}
+-- my_sum skips NULLs, and a group with no value at all is NULL rather than 0.
+SELECT grp, my_sum(x) AS total
+FROM (VALUES ('rows', 1.5::DOUBLE), ('rows', 2.5), ('all NULL', NULL::DOUBLE)) t(grp, x)
+GROUP BY grp
+ORDER BY grp;
+```
 
-SELECT my_sum(x) FROM (VALUES (NULL::DOUBLE)) t(x);
--- NULL: an empty group, not 0
+The failure path is a runnable block too — it declares that it is supposed to fail:
+
+```sql {"type":"duckfn","expect":"error"}
+SELECT my_greet_checked(' x ');    -- error: no surrounding whitespace
 ```
 
 A single query from the command line, without a REPL:

@@ -114,8 +114,10 @@ just docs_build      # 真正该跑的那一条：onBrokenLinks 设为 throw，�
 ```
 
 模板里的页面写的是示例函数；你的 API 长出自己的样子之后，把这些页面（以及 `docs/i18n/zh-Hans/` 下的译文）
-改掉，或者直接删掉 `docs/` —— 仓库里没有别的东西依赖它。约定（目录、命令、翻译流程、部署、
-`{{EXTENSION_VERSION}}` 版本占位符）写在 [`docs/README.md`](docs/README.md) 里。
+改掉，或者直接删掉 `docs/` —— 仓库里没有别的东西依赖它。页面里带着可运行的 SQL 块（由
+[`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit) 提供），在浏览器里直接调用本扩展；
+`cd docs && npm test` 会把它们重跑一遍。约定（目录、命令、翻译流程、部署、`{{EXTENSION_VERSION}}`
+版本占位符）写在 [`docs/README.md`](docs/README.md) 里。
 
 ## 安装已发布的扩展
 

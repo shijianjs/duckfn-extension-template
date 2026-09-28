@@ -117,9 +117,11 @@ just docs_build      # the check that matters: onBrokenLinks is set to throw
 ```
 
 The template's pages describe the sample functions; rewrite them (and their translations under
-`docs/i18n/zh-Hans/`) as your API grows, or delete `docs/` — nothing else depends on it. The
-conventions — layout, commands, translation workflow, deployment, the `{{EXTENSION_VERSION}}`
-version placeholder — are in [`docs/README.md`](docs/README.md).
+`docs/i18n/zh-Hans/`) as your API grows, or delete `docs/` — nothing else depends on it. The pages
+carry runnable SQL blocks (powered by [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit))
+that call the extension right in the browser; `cd docs && npm test` re-runs them. The conventions —
+layout, commands, translation workflow, deployment, the `{{EXTENSION_VERSION}}` version placeholder —
+are in [`docs/README.md`](docs/README.md).
 
 ## Installing the released extension
 

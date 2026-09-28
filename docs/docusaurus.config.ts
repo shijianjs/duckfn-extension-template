@@ -1,7 +1,10 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import remarkVersionPlaceholder from './plugins/remark-extension-version';
+import {remarkVersionPlaceholder} from 'duckfn-docs-kit/remark';
+import {remarkRunnableSql} from 'duckfn-docs-kit/sql/remark';
+import {dfkExtensions} from 'duckfn-docs-kit/sql/extensions';
+import {dfkTocToggle} from 'duckfn-docs-kit/toc-toggle/plugin';
 import {EXTENSION_VERSION} from './extension-version';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -17,6 +20,17 @@ import {EXTENSION_VERSION} from './extension-version';
 // `my_extension` occurrences are rewritten by `just rename <new-name>`.
 // ============================================================================
 const REPO_URL = 'https://github.com/<owner>/<repo>';
+
+// `dfkExtensions` 要的是 `owner/repo` 这个 slug，而不是完整 URL；从 REPO_URL 派生，占位符只写一份。
+// 仍是占位符时（还没填 `<owner>/<repo>`）就不预加载扩展 —— 可运行 SQL 块照常渲染，只是点 Run 时
+// 拿不到扩展函数。见下面 plugins 里的 preload 列表与 docs/README.md 的「Preloaded extensions」。
+//
+// `dfkExtensions` wants the `owner/repo` slug rather than the URL; deriving it here keeps the
+// placeholder in one place. While it is still the placeholder the extension is simply not preloaded —
+// the runnable SQL blocks still render, they just cannot call the extension's functions. See the
+// `preload` list in `plugins` below and "Preloaded extensions" in docs/README.md.
+const REPO_SLUG = REPO_URL.replace(/^https:\/\/github\.com\//, '');
+const HAS_REPO = !REPO_SLUG.includes('<');
 
 // GitHub Pages 把项目站挂在子路径下（https://<owner>.github.io/<repo>），所以 `url` / `baseUrl`
 // 由工作流注入（见 ../.github/workflows/DeployDocs.yml）。下面两个是本地开发的兜底值。
@@ -49,9 +63,12 @@ const config: Config = {
   // links keep working through the redirect.
   trailingSlash: true,
 
-  // Small client-side enhancements the theme has no option for; each file under
-  // src/clientModules/ documents what it does. Paths resolve from this directory.
-  clientModules: ['./src/clientModules/tocToggle.ts'],
+  // 客户端增强一律由 duckfn-docs-kit 的插件注入（见下面 plugins）：`dfkExtensions` 注册 `dfk-*` 元素，
+  // `dfkTocToggle` 注入目录折叠控件 —— 本站因此不再需要 src/clientModules/ 里的自备文件。
+  //
+  // Client-side enhancements all come from the kit's plugins (see `plugins` below): `dfkExtensions`
+  // registers the `dfk-*` elements and `dfkTocToggle` injects the TOC collapse control, so this site
+  // keeps no src/clientModules/ files of its own.
 
   // English is the source language; every page under docs/ can be translated under
   // i18n/zh-Hans/. Add more locales here when needed.
@@ -88,7 +105,13 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Replaces the `{{EXTENSION_VERSION}}` placeholder with the version from
           // docs/extension-version.ts, so a release only has to update that one file.
-          remarkPlugins: [remarkVersionPlaceholder],
+          // Both plugins ship in duckfn-docs-kit; only the version value is site-specific.
+          // `remarkRunnableSql` turns `sql {"type":"duckfn",…}` fenced blocks into
+          // `<dfk-sql>` runnable examples (see docs/README.md).
+          remarkPlugins: [
+            [remarkVersionPlaceholder, {version: EXTENSION_VERSION, placeholder: '{{EXTENSION_VERSION}}'}],
+            remarkRunnableSql,
+          ],
           // Remove this to remove the "edit this page" links.
           editUrl: `${REPO_URL}/tree/main/docs/`,
           // Without this, translated pages link back to the English source in docs/docs/;
@@ -102,6 +125,35 @@ const config: Config = {
         },
       } satisfies Preset.Options,
     ],
+  ],
+
+  // The docs-kit wiring: `dfkExtensions` fetches this extension's released wasm file into
+  // `static/duckdb-extensions/` at dev/build startup (cached locally, re-fetched only when the
+  // release asset's sha256 changes), injects the ordered preload list into every page, and registers
+  // the `dfk-*` elements; `dfkTocToggle` adds the TOC collapse control. Together they replace the
+  // client modules this site used to keep under src/clientModules/.
+  //
+  // Runnable SQL blocks call the extension, so they need a GitHub Release to exist first: the file is
+  // fetched from the repository's latest release, and `preload` stays empty until `REPO_URL` is filled
+  // in (see docs/README.md, "Preloaded extensions").
+  plugins: [
+    dfkExtensions({
+      // CI builds the release assets without DuckDB's signing keys — the same reason local
+      // development runs `duckdb -unsigned`.
+      allowUnsignedExtensions: true,
+      preload: HAS_REPO
+        ? [
+            {
+              // Served at <baseUrl>/duckdb-extensions/my_extension.duckdb_extension.wasm. The name
+              // must keep `my_extension` before the first dot: that base is the entry symbol DuckDB
+              // looks up, hence the rename from the release asset (which carries the wasm suffix).
+              url: 'duckdb-extensions/my_extension.duckdb_extension.wasm',
+              release: {repository: REPO_SLUG, asset: 'my_extension-wasm_eh.duckdb_extension.wasm'},
+            },
+          ]
+        : [],
+    }),
+    dfkTocToggle(),
   ],
 
   // No `themes` entry for the search UI: the classic preset already registers

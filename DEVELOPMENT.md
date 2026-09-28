@@ -231,7 +231,14 @@ just docs_build      # the build, and the "are any links broken?" check (onBroke
 ```
 
 Maintaining the site itself — layout, translation workflow, deployment, what to change after cloning —
-is in `docs/README.md`. Only two things here touch the release flow:
+is in `docs/README.md`. The reusable pieces — the home-page `<dfk-*>` components, the TOC collapse
+control, the version-placeholder remark plugin and the runnable SQL blocks — come from
+[`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit) as an npm dependency, so the site
+keeps no copies of them. The pages' `sql {"type":"duckfn",…}` blocks run in the reader's browser
+against DuckDB-Wasm and call the extension, which the site preloads from the repository's latest GitHub
+Release; `cd docs && npm test` re-runs every block. Both need a release to exist — see `docs/README.md`.
+
+Only two things here touch the release flow:
 
 - Version numbers in the pages are written as the `{{EXTENSION_VERSION}}` placeholder (inside a code
   block or inline code) and substituted at build time from `docs/extension-version.ts`; `scripts/release.sh

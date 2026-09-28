@@ -32,10 +32,12 @@ fn my_greet_checked(name: String) -> DuckOptionResult<String> {
 }
 ```
 
-```sql
-LOAD './target/debug/my_extension.duckdb_extension';
-SELECT my_greet_checked('world');  -- Hello, world!
-SELECT my_greet_checked('');       -- NULL
+The same function from SQL. This block runs in your browser: the site preloads the extension from the
+repository's latest release, so there is no `LOAD` to write here.
+
+```sql {"type":"duckfn","show":"table"}
+SELECT name AS input, my_greet_checked(name) AS greeting
+FROM (VALUES ('world'), ('')) t(name);
 ```
 
 :::note[The pages themselves are part of the template]
