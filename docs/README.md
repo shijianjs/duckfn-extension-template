@@ -31,7 +31,7 @@ if you would rather not have a site (nothing else in the repository depends on i
 
 1. `REPO_URL` in `docusaurus.config.ts` — the navbar, the footer, the home page and the runnable
    blocks' extension preload all read it from there (the home page also gets it as
-   `customFields.repoUrl`).
+   `customFields.repoUrl`). It ships pointing at the template's own repository; change it to yours.
 2. `tagline` in `docusaurus.config.ts`, plus the copyright line in the footer and in
    `i18n/zh-Hans/docusaurus-theme-classic/footer.json`.
 3. The logo: `static/img/logo.svg` is a placeholder, and the brand palette in `src/css/custom.css` was
@@ -94,13 +94,13 @@ release asset, which carries the wasm suffix.
 
 Two consequences worth knowing:
 
-- **A release has to exist first.** Until you have tagged `v*.*.*` once, the plugin has nothing to
-  fetch and `npm run build` fails. While `REPO_URL` in `docusaurus.config.ts` is still the
-  `<owner>/<repo>` placeholder the preload list stays empty, so a fresh clone builds fine — the
-  blocks just cannot call the extension until you fill the URL in and cut a release. Note that on a
-  brand-new repository the **first** tag's Deploy Docs run can fail for the same reason: the release
-  is created by the *other* workflow the tag triggers, in parallel. Re-run Deploy Docs once the
-  release is up.
+- **The release has to exist, and `REPO_URL` has to point at the right repository.** The template
+  ships with `REPO_URL` set to the template's own repository, whose `v0.1.0` release is what lets the
+  template's blocks run out of the box. A clone has to repoint it at its own repository (`just rename`
+  only rewrites the extension name) and tag `v*.*.*` once — until then the plugin has nothing to
+  fetch and `npm run build` fails. Note that on a brand-new repository the **first** tag's Deploy Docs
+  run can fail for the same reason: the release is created by the *other* workflow the tag triggers,
+  in parallel. Re-run Deploy Docs once the release is up.
 - Downloads are cached under `.cache/duckfn-docs-kit/` and only re-fetched when the release asset's
   sha256 changes; with a warm cache the build works offline. Both `.cache/` and
   `static/duckdb-extensions/` are gitignored — a file placed there by hand needs `git add -f`.

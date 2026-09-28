@@ -183,10 +183,10 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
   `id` / `slug` / `sidebar_position` 与英文页保持一致，页内链接用相对文件路径（写 `/docs/…` 会把中文页
   送到英文页）。可运行块的 SQL 是代码，照抄，只翻注释。
 - **可运行 SQL 块**（info string 为 `{"type":"duckfn",…}` 的 `sql` 围栏）在浏览器里用 DuckDB-Wasm 真跑，
-  并调用本扩展 —— 扩展由 `dfkExtensions` 从仓库的**最新 Release** 预加载。因此**先有一次 tag/Release
-  才能 `npm run build`**（`REPO_URL` 还是占位符时不预加载，构建照常过）；`cd docs && npm test` 会把每个
-  块重跑一遍。不需要这套能力时，把 `docusaurus.config.ts` 里的 `remarkRunnableSql` 与 `dfkExtensions`
-  两行去掉即可。
+  并调用本扩展 —— 扩展由 `dfkExtensions` 从 `REPO_URL` 指向仓库的**最新 Release** 预加载。因此克隆后要把
+  `REPO_URL` 改成自己的仓库（`just rename` 只改扩展名，不动这个 URL），并且**先有一次 tag/Release 才能
+  `npm run build`**；`cd docs && npm test` 会把每个块重跑一遍。不需要这套能力时，把
+  `docusaurus.config.ts` 里的 `remarkRunnableSql` 与 `dfkExtensions` 两行去掉即可。
 
 ### 社区扩展注册
 

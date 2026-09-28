@@ -19,18 +19,19 @@ import {EXTENSION_VERSION} from './extension-version';
 // footer and the home page button, so it is written once and referenced everywhere else. The
 // `my_extension` occurrences are rewritten by `just rename <new-name>`.
 // ============================================================================
-const REPO_URL = 'https://github.com/<owner>/<repo>';
-
-// `dfkExtensions` 要的是 `owner/repo` 这个 slug，而不是完整 URL；从 REPO_URL 派生，占位符只写一份。
-// 仍是占位符时（还没填 `<owner>/<repo>`）就不预加载扩展 —— 可运行 SQL 块照常渲染，只是点 Run 时
-// 拿不到扩展函数。见下面 plugins 里的 preload 列表与 docs/README.md 的「Preloaded extensions」。
+// 模板自己的仓库地址：首页徽章、导航栏、页脚与可运行 SQL 的扩展预加载都从这里取。克隆后**要改成你的
+// 仓库**（`just rename` 只改扩展名，不动这个 URL），否则预加载会去模板仓库找 Release。
 //
-// `dfkExtensions` wants the `owner/repo` slug rather than the URL; deriving it here keeps the
-// placeholder in one place. While it is still the placeholder the extension is simply not preloaded —
-// the runnable SQL blocks still render, they just cannot call the extension's functions. See the
-// `preload` list in `plugins` below and "Preloaded extensions" in docs/README.md.
+// The template's own repository: the home-page badges, the navbar, the footer and the runnable SQL
+// preload all read it from here. **Repoint it at your repository after cloning** — `just rename` only
+// rewrites the extension name, not this URL — or the preload will look for a release in the template's
+// repository instead of yours.
+const REPO_URL = 'https://github.com/shijianjs/duckfn-extension-template';
+
+// `dfkExtensions` 要的是 `owner/repo` 这个 slug，而不是完整 URL（见下面 plugins 的 preload 列表）。
+//
+// `dfkExtensions` wants the `owner/repo` slug rather than the URL (see the `preload` list in `plugins`).
 const REPO_SLUG = REPO_URL.replace(/^https:\/\/github\.com\//, '');
-const HAS_REPO = !REPO_SLUG.includes('<');
 
 // GitHub Pages 把项目站挂在子路径下（https://<owner>.github.io/<repo>），所以 `url` / `baseUrl`
 // 由工作流注入（见 ../.github/workflows/DeployDocs.yml）。下面两个是本地开发的兜底值。
@@ -133,25 +134,24 @@ const config: Config = {
   // the `dfk-*` elements; `dfkTocToggle` adds the TOC collapse control. Together they replace the
   // client modules this site used to keep under src/clientModules/.
   //
-  // Runnable SQL blocks call the extension, so they need a GitHub Release to exist first: the file is
-  // fetched from the repository's latest release, and `preload` stays empty until `REPO_URL` is filled
-  // in (see docs/README.md, "Preloaded extensions").
+  // Runnable SQL blocks call the extension, so one has to exist as a release: the file is fetched from
+  // the latest GitHub Release of the repository in `REPO_URL` (see docs/README.md, "Preloaded
+  // extensions"). A clone therefore repoints `REPO_URL` at its own repository and cuts a release
+  // before the blocks can run.
   plugins: [
     dfkExtensions({
       // CI builds the release assets without DuckDB's signing keys — the same reason local
       // development runs `duckdb -unsigned`.
       allowUnsignedExtensions: true,
-      preload: HAS_REPO
-        ? [
-            {
-              // Served at <baseUrl>/duckdb-extensions/my_extension.duckdb_extension.wasm. The name
-              // must keep `my_extension` before the first dot: that base is the entry symbol DuckDB
-              // looks up, hence the rename from the release asset (which carries the wasm suffix).
-              url: 'duckdb-extensions/my_extension.duckdb_extension.wasm',
-              release: {repository: REPO_SLUG, asset: 'my_extension-wasm_eh.duckdb_extension.wasm'},
-            },
-          ]
-        : [],
+      preload: [
+        {
+          // Served at <baseUrl>/duckdb-extensions/my_extension.duckdb_extension.wasm. The name must
+          // keep `my_extension` before the first dot: that base is the entry symbol DuckDB looks up,
+          // hence the rename from the release asset (which carries the wasm suffix).
+          url: 'duckdb-extensions/my_extension.duckdb_extension.wasm',
+          release: {repository: REPO_SLUG, asset: 'my_extension-wasm_eh.duckdb_extension.wasm'},
+        },
+      ],
     }),
     dfkTocToggle(),
   ],

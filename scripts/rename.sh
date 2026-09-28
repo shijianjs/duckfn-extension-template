@@ -107,9 +107,11 @@ echo
 echo "已改名的文件如上（共 ${#files[@]} 个）。还要手工过一遍："
 echo "  1. 示例函数（my_greet / my_greet_checked / my_sum）与 test/sql/*.test —— 换成你自己的 API，"
 echo "     顺手把 AGENTS.md 里函数名前缀那条约定（默认 my_）改成你的前缀"
-echo "  2. community-extension/description.yml —— extension.name / description / maintainers / repo"
-echo "  3. AGENTS.md 的 {{PROJECT_GOAL}} 占位符"
-echo "  4. README / DEVELOPMENT 的说明文字（模板的来历、示例用法）"
-echo "  5. LICENSE 的版权人、Cargo.toml 的 duckfn 版本"
+echo "  2. docs/docusaurus.config.ts 的 REPO_URL —— 改成你的仓库地址（本脚本只改扩展名，不动 URL；"
+echo "     它同时是首页徽章与可运行 SQL 预加载的来源，不换会去模板仓库找 Release）"
+echo "  3. community-extension/description.yml —— extension.name / description / maintainers / repo"
+echo "  4. AGENTS.md 的 {{PROJECT_GOAL}} 占位符"
+echo "  5. README / DEVELOPMENT 的说明文字（模板的来历、示例用法）"
+echo "  6. LICENSE 的版权人、Cargo.toml 的 duckfn 版本"
 echo
 git --no-pager diff --stat
