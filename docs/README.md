@@ -21,7 +21,7 @@ if you would rather not have a site (nothing else in the repository depends on i
 | `src/pages/index.tsx` | Home page: hero, feature cards, the Rust/SQL showcase and the "where to go next" cards. The hero, the feature grid and the next-step cards are `<dfk-*>` custom elements from [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit), mounted through callback refs and fed with the imperative `translate()` API; every string still has an entry in `i18n/zh-Hans/code.json` under `homepage.*`. The code showcase stays here because it needs the theme's `CodeBlock`. |
 | `src/pages/index.module.css` | The code showcase's styles. The hero, feature grid and cards carry their own styles inside the kit's shadow DOM, so they are not here. |
 | `src/css/custom.css` | Palette and theme overrides. It pulls the kit's global CSS in with `@import 'duckfn-docs-kit/src/kit.css'` (the `--duckfn-*` brand tokens and the TOC-toggle styles); this file itself only owns the Infima ramp. |
-| `static/` | Files copied to the site root (images, `favicon.ico`, `.nojekyll`). |
+| `static/` | Files copied to the site root (images, `.nojekyll`). |
 | `sidebars.ts` | Sidebar definition. Categories come from `_category_.json`; order from `sidebar_position`. |
 | `docusaurus.config.ts` | Site configuration: `REPO_URL`, locales, navbar, footer, and the docs-kit plugins. |
 | `extension-version.ts` | The version shown in the docs. The only place it is written; `{{EXTENSION_VERSION}}` in the markdown is replaced from here at build time. |
@@ -37,7 +37,7 @@ if you would rather not have a site (nothing else in the repository depends on i
 3. The logo: `static/img/logo.svg` is a placeholder, and the brand palette in `src/css/custom.css` was
    picked to match it — replace both together, or neither. The kit's `--duckfn-*` tokens (imported at
    the top of that file) carry the same blue; override them there if your mark uses another colour.
-4. `static/img/docusaurus-social-card.jpg` (the preview image) and `static/img/favicon.ico`.
+4. `static/img/docusaurus-social-card.jpg` (the preview image) and `static/img/logo.svg`.
 5. The pages under `docs/docs/` and their translations under
    `i18n/zh-Hans/docusaurus-plugin-content-docs/current/`.
 6. Optional: search. See the commented `algolia` block in `docusaurus.config.ts`; DocSearch is free but
