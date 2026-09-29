@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "install-verbose": "npm i --loglevel verbose",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "start:zh-Hans": "docusaurus start --locale zh-Hans",
@@ -51,5 +52,10 @@
   },
   "engines": {
     "node": ">=20.0"
+  },
+  "allowScripts": {
+    "core-js@3.50.0": true,
+    "@swc/core@1.16.12": true,
+    "@swc/html@1.16.12": true
   }
 }
