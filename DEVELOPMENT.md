@@ -130,17 +130,19 @@ is in it. Write them from duckfn's docs and example extension rather than from m
   `docs/docs/guide/` and its example extension under `src/extension/`);
 - `DuckLazy<T>` arguments ("parse the options once"), named types, `list<struct>` results;
 - `overloads_name` (several signatures merged into one function set under one name);
-- DuckDB's host file system (`duckfn::duck_vfs`, reading and writing files) and the chrono / uuid /
-  rust_decimal bridges;
+- DuckDB's host file system (`duckfn::duck_vfs`, reading and writing files; enable `owned-connection`
+  explicitly) and the chrono / uuid / rust_decimal bridges;
 - platform-specific dependencies (the `[target.'cfg(...)'.dependencies]` pattern is described in the
   trade-off section of AGENTS.md).
 
 ## Dependencies
 
 - [duckfn](https://crates.io/crates/duckfn): the attribute macros that register ordinary Rust functions
-  with DuckDB. Two features are on: `duckdb-1-5` (what only reached the C API in DuckDB 1.5; the host
-  file system lives there) and `cli` (the command-line tool behind `src/bin/duckfn.rs`, which pulls clap
-  and csv into duckfn). The macros also generate a `SQL_NAME` constant per signature, and the
+  with DuckDB. The dependency turns on `all` (= `duckdb-1-5` + `cli` + `chrono` + `uuid` +
+  `rust_decimal`): `duckdb-1-5` is what only reached the C API in DuckDB 1.5, `cli` the command-line
+  tool behind `src/bin/duckfn.rs` (which pulls clap and csv into duckfn). It does **not** include
+  `owned-connection`, the feature that gates the host file system (`duckfn::duck_vfs`) — enable it
+  explicitly when you need it. The macros also generate a `SQL_NAME` constant per signature, and the
   `description` / `comment` / `example` attributes are the one source of the function-description CSV
   (see below).
 - [quack-rs](https://crates.io/crates/quack-rs): the DuckDB C API bindings — the code expanded by

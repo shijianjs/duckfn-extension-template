@@ -116,15 +116,18 @@ community-extension/    社区扩展注册的两份文件与流程说明
   `docs/docs/guide/` 与示例扩展 `src/extension/`）；
 - `DuckLazy<T>` 参数（「配置只解析一次」）、命名类型、`list<struct>` 返回值；
 - `overloads_name`（同名多签名并成一个函数集）；
-- DuckDB 的宿主文件系统（`duckfn::duck_vfs`，落盘读写）、与 chrono / uuid / rust_decimal 的互转；
+- DuckDB 的宿主文件系统（`duckfn::duck_vfs`，落盘读写，要显式开 `owned-connection`）、与 chrono / uuid /
+  rust_decimal 的互转；
 - 平台相关的依赖（`[target.'cfg(...)'.dependencies]` 的写法见 AGENTS.md 的取舍一节）。
 
 ## 依赖
 
-- [duckfn](https://crates.io/crates/duckfn)：属性宏，把普通 Rust 函数注册成 DuckDB 函数。开了两个
-  feature：`duckdb-1-5`（DuckDB 1.5 才进 C API 的能力，宿主文件系统在它下面）与 `cli`
-  （`src/bin/duckfn.rs` 用的命令行工具，给 duckfn 带上 clap 与 csv）。属性宏还会为每个签名生成
-  `SQL_NAME` 常量；属性上的 `description` / `comment` / `example` 则是函数描述 CSV 的唯一来源（见下）。
+- [duckfn](https://crates.io/crates/duckfn)：属性宏，把普通 Rust 函数注册成 DuckDB 函数。依赖开了
+  `all`（= `duckdb-1-5` + `cli` + `chrono` + `uuid` + `rust_decimal`）：`duckdb-1-5` 是 DuckDB 1.5 才
+  进 C API 的能力，`cli` 是 `src/bin/duckfn.rs` 用的命令行工具（给 duckfn 带上 clap 与 csv）。它**不含**
+  `owned-connection`（宿主文件系统 `duckfn::duck_vfs` 挂在那一档上，要用得显式加）。属性宏还会为每个
+  签名生成 `SQL_NAME` 常量；属性上的 `description` / `comment` / `example` 则是函数描述 CSV 的唯一来源
+  （见下）。
 - [quack-rs](https://crates.io/crates/quack-rs)：DuckDB C API 绑定，`duckfn_entrypoint!` 展开出的代码
   直接引用它。
 - [libduckdb-sys](https://crates.io/crates/libduckdb-sys)：只取头文件，开启 `loadable-extension`，
