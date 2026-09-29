@@ -123,6 +123,11 @@ build of the extension, which only exists after a release, and the Deploy Docs w
 the release it depends on. Run it locally after a release, or from a checkout that already has the
 file under `static/duckdb-extensions/`.
 
+Since `duckfn-docs-kit` 0.3.0 the blocks run in a **real browser**, on the site's own runtime:
+`playwright-core` drives the Chrome/Edge already installed on the machine (it never downloads a
+browser, so a system Chrome or Edge is required — override with `--browser <path>` or `DFK_BROWSER`).
+Being a browser, it can also fetch remote `http(s)` data, which the Node worker of 0.2.x could not.
+
 ## Commands
 
 ```shell
