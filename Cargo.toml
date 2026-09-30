@@ -74,7 +74,7 @@ crate-type = ["staticlib"]
 # SQLLogicTest files: after any build they sit in cargo's unpacked source directory
 # (`<cargo>/registry/src/*/duckfn-<version>/`), matching the version pinned here — no duckfn repository
 # clone needed. AGENTS.md has the paths and a topic-by-topic map.
-duckfn = { version = "0.0.15", features = ["all"] }
+duckfn = { version = "0.0.17", features = ["all"] }
 
 # duckfn 本身就建立在下面两个 crate 之上；需要直接使用它们的类型或 builder 时显式加上。
 # quack-rs：duckfn_entrypoint! 展开出的代码直接引用 `quack_rs::` 路径，必须显式依赖。
