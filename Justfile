@@ -113,7 +113,7 @@ ci-release: ci-init
 build_wasm:
     cargo build --release --target wasm32-unknown-emscripten --example {{extension_name}}
 
-# 打出可加载的 wasm_eh 扩展 -> build/wasm_eh/extension/duckfn/duckfn.duckdb_extension.wasm
+# 打出可加载的 wasm_eh 扩展 -> build/wasm_eh/extension/my_extension/my_extension.duckdb_extension.wasm
 #
 # 直接调官方 makefile 的 wasm_eh 目标（configure → release → move_wasm_extension）：
 # cargo 出 libduckfn.a → emcc 出 side module → append_extension_metadata 出 .duckdb_extension.wasm。
