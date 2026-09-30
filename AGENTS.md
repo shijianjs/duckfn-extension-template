@@ -57,8 +57,8 @@ ls -d ~/.cargo/registry/src/*/duckfn-*/
 | Rust ↔ DuckDB 类型映射 | `docs/docs/guide/types.md` | `src/extension/types/**` |
 | 宿主文件系统（`duck_vfs`） | `docs/docs/guide/file-system.md` | `src/extension/functions/file_system.rs` |
 | 错误与 panic | `docs/docs/guide/errors-and-panics.md` | — |
-| 构建与发布 | `docs/docs/build-and-release.md` | — |
-| 排错 | `docs/docs/troubleshooting.md` | — |
+| 构建与发布 | `docs/docs/development/build-and-release.md` | — |
+| 排错（已知问题） | `docs/docs/known-issues.md` | — |
 | 社区扩展文档页（`function_descriptions.csv`） | `docs/docs/community-extension-docs.md` | `src/extension/functions/*.rs`（带 `description` / `example` 的那几个） |
 
 属性宏接受哪些参数、允许哪些返回形状，**真相在 `duckfn-macro` 的源码里** —— 它是独立发布的 crate，
@@ -183,10 +183,15 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
   `id` / `slug` / `sidebar_position` 与英文页保持一致，页内链接用相对文件路径（写 `/docs/…` 会把中文页
   送到英文页）。可运行块的 SQL 是代码，照抄，只翻注释。
 - **可运行 SQL 块**（info string 为 `{"type":"duckfn",…}` 的 `sql` 围栏）在浏览器里用 DuckDB-Wasm 真跑，
-  并调用本扩展 —— 扩展由 `dfkExtensions` 从 `REPO_URL` 指向仓库的**最新 Release** 预加载。因此克隆后要把
-  `REPO_URL` 改成自己的仓库（`just rename` 只改扩展名，不动这个 URL），并且**先有一次 tag/Release 才能
-  `npm run build`**；`cd docs && npm test` 会把每个块重跑一遍。不需要这套能力时，把
+  并调用本扩展。本地预加载的是 `static/duckdb-extensions/` 下**本机构建的那份**：`just test_wasm` 会先
+  `just build_wasm_eh` 构建、放进该目录，再跑一遍所有块；只有 GitHub Pages 部署才去拉 `REPO_URL` 指向
+  仓库的最新 Release（由 `DOCS_EXTENSION_FROM_RELEASE` 区分，见 `docs/docusaurus.config.ts`）。因此克隆后
+  要把 `REPO_URL` 改成自己的仓库（`just rename` 只改扩展名，不动这个 URL）。不需要这套能力时，把
   `docusaurus.config.ts` 里的 `remarkRunnableSql` 与 `dfkExtensions` 两行去掉即可。
+
+站点分成两个侧边栏、对应顶栏两项（见 `docs/sidebars.ts`）：**用户指南**（`intro` + `getting-started/` +
+`guide/`，讲怎么写这个扩展）与**开发指南**（`build-and-release`、`community-extension`，讲怎么构建、测试
+与发布它）。新增页面按这个归属放，两侧的文档树要各自翻译一份。
 
 ### 社区扩展注册
 
@@ -196,7 +201,8 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
 
 ## 共享 justfile：`scripts/common.just`
 
-日常命令（`build` / `sql` / `repl` / `lint` / `test` / `docs_*` / `ci-*` / `build_wasm*` / `release_*` …）
+日常命令（`build` / `sql` / `repl` / `lint` / `test` / `docs_*` / `ci-*` / `build_wasm*` / `test_wasm` /
+`release_*` …）
 都在 `scripts/common.just` 里；根 `Justfile` 只 `import "scripts/common.just"`，再留下机器相关的
 `set windows-shell`、项目相关的 `extension_name`，以及模板特有的 `rename`（由模板生成的项目还会
 加上自己的 recipe 与覆盖）。
