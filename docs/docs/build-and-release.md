@@ -98,3 +98,9 @@ The wasm build goes through `src/wasm_lib.rs`, a `staticlib` mirror of `src/lib.
 must always declare the same set of `mod`s, and platform-specific dependencies belong under
 `[target.'cfg(…'.dependencies]` in `Cargo.toml` so the wasm target does not pay for them (some crates
 do not compile for emscripten at all).
+
+Under `wasm32-unknown-emscripten` a `cdylib` has to be linked as a **side module**: cargo also builds
+the `cdylib` of the duckfn dependency, and without `-sSIDE_MODULE=2` emcc links it as a standalone
+module and fails with `undefined symbol: main`. That flag belongs to
+`.cargo/config.toml` (`[target.wasm32-unknown-emscripten] rustflags`) — keep it there, it is what makes
+`just build_wasm` / `just build_wasm_eh` work.

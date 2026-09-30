@@ -92,3 +92,8 @@ just build_wasm
 wasm 构建走 `src/wasm_lib.rs`（`src/lib.rs` 的 `staticlib` 镜像）。两个 crate root 必须始终声明同一组
 `mod`；平台相关的依赖请挂到 `Cargo.toml` 的 `[target.'cfg(…'.dependencies]` 下，别让 wasm 目标替它们付
 编译成本（有些 crate 在 emscripten 上根本编不过）。
+
+在 `wasm32-unknown-emscripten` 下，`cdylib` 必须按 **side module** 链接：cargo 会把依赖 duckfn 的
+`cdylib` 也编一遍，少了 `-sSIDE_MODULE=2` 时 emcc 会按独立模块链接、报 `undefined symbol: main`。
+这个 flag 写在 `.cargo/config.toml` 的 `[target.wasm32-unknown-emscripten] rustflags` 里 —— 别删，
+`just build_wasm` / `just build_wasm_eh` 靠它。
