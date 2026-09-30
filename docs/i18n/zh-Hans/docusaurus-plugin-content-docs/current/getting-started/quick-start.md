@@ -6,6 +6,15 @@ description: 改扩展名、用 cargo 构建出 .duckdb_extension、加载进 Du
 
 # 快速开始
 
+整页就是四步：
+
+```mermaid
+flowchart LR
+    rename["just rename"] --> build["just build"]
+    build --> load["用 -unsigned<br/>LOAD 产物"]
+    load --> call["在 SQL 里<br/>调用函数"]
+```
+
 ## 前置条件
 
 - **Rust** 1.86 或更新（`Cargo.toml` 里的 `rust-version`）。

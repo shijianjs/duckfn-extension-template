@@ -19,6 +19,18 @@ make debug               # 官方模板那条路，CI 也走它
 # -> build/debug/extension/my_extension/my_extension.duckdb_extension
 ```
 
+两条路径，以及各自把产物放在哪：
+
+```mermaid
+flowchart LR
+    src["Rust 源码"] --> cargo["cargo duckdb-ext build"]
+    src --> make["make debug<br/>官方路径，CI 也走它"]
+    cargo --> out1["target/debug/<br/>扩展名.duckdb_extension"]
+    make --> out2["build/debug/extension/<br/>扩展名.duckdb_extension"]
+    out1 --> load["在 DuckDB 里 LOAD"]
+    out2 --> load
+```
+
 `make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
 
 ## Justfile
@@ -62,13 +74,22 @@ make debug               # 官方模板那条路，CI 也走它
 
 ### 推一个 tag 会触发什么
 
-推送 `v*.*.*` 会起两条工作流：
+推送 `v*.*.*` 会启动 **Main Extension Distribution Pipeline**：
+
+```mermaid
+flowchart LR
+    bump["提升版本号<br/>并提交"] --> tag["推送 tag v*.*.*"]
+    tag --> ci["构建各平台<br/>并跑测试"]
+    ci --> rel["GitHub Release<br/>挂上产物"]
+    rel --> docs["随后部署<br/>文档站"]
+```
 
 - **Main Extension Distribution Pipeline** —— 为所有支持的平台构建扩展、跑测试，然后为该 tag 创建
   （或更新）GitHub Release，把产物按 `<扩展名>-<架构>.duckdb_extension` 挂上去（wasm 那份是
   `.duckdb_extension.wasm`）。release notes 是上一个版本 tag 到当前 tag 之间的提交。
-- **Deploy Docs** —— 构建 `docs/` 并发布到 GitHub Pages（需要先在 Settings → Pages → Source 里选
-  *GitHub Actions*，一次性设置）。
+- **Deploy Docs** 不是由 tag 启动的，而是由那条流水线**跑完**触发：它构建 `docs/` 并发布到 GitHub
+  Pages（会等 Release 就绪，部署出去的站点预加载的正是它）。需要先在 Settings → Pages → Source 里选
+  *GitHub Actions*，一次性设置。
 
 PR 只构建 + 测试，不发布：发布那一步由「当前 ref 是版本 tag」这个条件把着。
 

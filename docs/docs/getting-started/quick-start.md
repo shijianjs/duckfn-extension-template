@@ -6,6 +6,15 @@ description: Rename the extension, build the .duckdb_extension with cargo, load 
 
 # Quick start
 
+The whole page in four steps:
+
+```mermaid
+flowchart LR
+    rename["just rename"] --> build["just build"]
+    build --> load["LOAD the artifact<br/>with -unsigned"]
+    load --> call["Call the functions<br/>from SQL"]
+```
+
 ## Prerequisites
 
 - **Rust** 1.86 or newer (`rust-version` in `Cargo.toml`).

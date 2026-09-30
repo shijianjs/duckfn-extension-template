@@ -19,6 +19,18 @@ make debug               # the official template path, also what CI runs
 # -> build/debug/extension/my_extension/my_extension.duckdb_extension
 ```
 
+The two paths and where each one puts the artifact:
+
+```mermaid
+flowchart LR
+    src["Rust sources"] --> cargo["cargo duckdb-ext build"]
+    src --> make["make debug<br/>official path, also CI"]
+    cargo --> out1["target/debug/<br/>extension.duckdb_extension"]
+    make --> out2["build/debug/extension/<br/>extension.duckdb_extension"]
+    out1 --> load["LOAD in DuckDB"]
+    out2 --> load
+```
+
 `make release` is the optimized version of the same flow. On Windows `make` has to run inside Git
 Bash.
 
@@ -65,14 +77,23 @@ site deployment.
 
 ### What a tag triggers
 
-Pushing `v*.*.*` starts two workflows:
+Pushing `v*.*.*` starts **Main Extension Distribution Pipeline**:
+
+```mermaid
+flowchart LR
+    bump["Bump the version<br/>and commit"] --> tag["Push tag v*.*.*"]
+    tag --> ci["Build every platform<br/>and run tests"]
+    ci --> rel["GitHub Release<br/>with the binaries"]
+    rel --> docs["Deploy Docs<br/>afterwards"]
+```
 
 - **Main Extension Distribution Pipeline** — builds the extension for every supported platform, runs the
   tests, then creates (or updates) a GitHub Release for that tag with the built binaries attached as
   `<extension>-<arch>.duckdb_extension` (the wasm ones as `.duckdb_extension.wasm`). Release notes are
   the commits since the previous version tag.
-- **Deploy Docs** — builds `docs/` and publishes it to GitHub Pages (needs the one-time
-  *Settings → Pages → Source: GitHub Actions* setting).
+- **Deploy Docs** is not started by the tag but by that pipeline *finishing*: it builds `docs/` and
+  publishes it to GitHub Pages (it waits for the release, which the deployed site then preloads). It
+  needs the one-time *Settings → Pages → Source: GitHub Actions* setting.
 
 Pull requests run the build and the tests only; publishing is gated on the ref being a version tag.
 

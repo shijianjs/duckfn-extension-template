@@ -18,6 +18,15 @@ the expected result inline, so a test doubles as a worked example of the functio
 
 ## Running them
 
+How a file reaches the runner:
+
+```mermaid
+flowchart LR
+    file["test/sql/*.test"] --> req["require my_extension<br/>loads the artifact"]
+    req --> blocks["query / statement blocks<br/>expected output inline"]
+    blocks --> runner["duckdb_sqllogictest<br/>compares and reports"]
+```
+
 ```shell
 just test                 # = make configure + make debug + make test
 just ci-build             # just the official build, without the tests

@@ -45,6 +45,15 @@ just docs_csv
 cp target/function_descriptions.csv community-extension/docs/function_descriptions.csv
 ```
 
+从属性到页面：
+
+```mermaid
+flowchart LR
+    attrs["属性上的 description / comment / example"] --> csv["function_descriptions.csv<br/>just docs_csv"]
+    csv --> copy["community-extension/docs/"]
+    copy --> page["社区扩展页<br/>Added Functions 表"]
+```
+
 多条示例导出时用 `"; "` 拼接、每条去掉结尾分号；换行会压成一个空格（生成页是 Markdown 表格）。所以一句
 一条完整 SQL，用英文写即可。
 

@@ -36,6 +36,17 @@ forwards it a second time from the wasm root, which breaks as soon as modules ne
 (`error[E0583]: file not found for module …`): there would be two copies of the same path set to keep
 in sync.
 
+Three entry points compile the same module tree — the two crate roots and the CLI:
+
+```mermaid
+flowchart LR
+    native["src/lib.rs<br/>native crate root"] --> tree["src/extension/mod.rs<br/>entry point and module tree"]
+    wasm["src/wasm_lib.rs<br/>wasm crate root"] --> tree
+    cli["src/bin/duckfn.rs<br/>CLI entry"] --> tree
+    tree --> functions["functions/<br/>registered functions"]
+    tree --> types["types/<br/>SQL-facing types"]
+```
+
 Adding a module therefore means editing `extension/mod.rs` (and the `mod.rs` of the layer below), never
 the crate roots.
 

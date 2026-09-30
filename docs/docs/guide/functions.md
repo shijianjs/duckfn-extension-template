@@ -10,6 +10,16 @@ A registered function is "an ordinary Rust function plus one attribute macro". T
 wrapper, reads the argument columns, writes the result column, and submits the registration; the body
 holds nothing but your logic.
 
+The path from a plain function to a callable SQL function:
+
+```mermaid
+flowchart LR
+    fn["Plain Rust function"] --> macro["duck attribute macro"]
+    macro --> wrapper["FFI wrapper and<br/>registration item"]
+    wrapper --> cdylib["Extension binary<br/>cdylib"]
+    cdylib --> load["LOAD in DuckDB"]
+```
+
 ## The samples
 
 | Function | Kind | Signature | Behaviour |

@@ -33,6 +33,17 @@ community-extension/        社区扩展注册草稿
 往下挂。官方 Rust 模板的写法是 `mod lib;` 再由 wasm 那个 root 转发一次，模块一嵌套就会
 `error[E0583]: file not found for module …`：那等于同一组路径存了两份、要一直保持同步。
 
+三个入口都编同一棵模块树 —— 两个 crate root 与那个 CLI：
+
+```mermaid
+flowchart LR
+    native["src/lib.rs<br/>原生 crate root"] --> tree["src/extension/mod.rs<br/>入口点与模块树"]
+    wasm["src/wasm_lib.rs<br/>wasm crate root"] --> tree
+    cli["src/bin/duckfn.rs<br/>CLI 入口"] --> tree
+    tree --> functions["functions/<br/>注册进 DuckDB 的函数"]
+    tree --> types["types/<br/>面向 SQL 的类型"]
+```
+
 所以新增模块只需要动 `extension/mod.rs`（以及下一层的 `mod.rs`），永远不用改 crate root。
 
 ## 命令行工具

@@ -9,6 +9,16 @@ description: 示例标量函数与聚合函数逐行拆解、duckfn 对入参与
 一个注册进 DuckDB 的函数 = 「一个普通 Rust 函数 + 一个属性宏」。宏负责生成 FFI 包装层、读参数列、写
 结果列、提交注册项；函数体里只有你的逻辑。
 
+从一个普通函数到可调用的 SQL 函数：
+
+```mermaid
+flowchart LR
+    fn["普通 Rust 函数"] --> macro["duck 属性宏"]
+    macro --> wrapper["FFI 包装层与<br/>注册项"]
+    wrapper --> cdylib["扩展二进制<br/>cdylib"]
+    cdylib --> load["在 DuckDB 里 LOAD"]
+```
+
 ## 示例
 
 | 函数 | 类别 | 签名 | 行为 |

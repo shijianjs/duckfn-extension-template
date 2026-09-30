@@ -18,6 +18,15 @@ description: test/sql 下的 SQLLogicTest 用例、三种跑法（make、just �
 
 ## 怎么跑
 
+一个文件是怎么走到运行器的：
+
+```mermaid
+flowchart LR
+    file["test/sql/*.test"] --> req["require my_extension<br/>加载产物"]
+    req --> blocks["query / statement 块<br/>期望结果写在原地"]
+    blocks --> runner["duckdb_sqllogictest<br/>比对并报告"]
+```
+
 ```shell
 just test                 # = make configure + make debug + make test
 just ci-build             # 只做官方构建，不跑测试

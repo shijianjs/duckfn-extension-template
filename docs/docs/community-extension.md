@@ -47,6 +47,15 @@ just docs_csv
 cp target/function_descriptions.csv community-extension/docs/function_descriptions.csv
 ```
 
+From the attribute to the page:
+
+```mermaid
+flowchart LR
+    attrs["description / comment / example<br/>on the duck attribute"] --> csv["function_descriptions.csv<br/>just docs_csv"]
+    csv --> copy["community-extension/docs/"]
+    copy --> page["Community page<br/>Added Functions table"]
+```
+
 Several examples are joined with `"; "` on export and lose their trailing semicolons; newlines collapse
 into spaces, because the target is a Markdown table. Write one complete statement per entry, in English.
 
