@@ -35,6 +35,12 @@ Bash.
 | `just docs_build` / `just docs_start` | Build / serve this documentation site |
 | `just rename <name>` | Rewrite the extension name everywhere |
 | `just release_*` | The release flow below |
+| `just sync-common` / `just check-common` | Update / verify `scripts/common.just` (below) |
+
+Every recipe here lives in `scripts/common.just` — a file shared by every extension project and imported
+by the root `Justfile` (`just --list` shows the merged set). Its source of truth is the duckfn
+repository: `just sync-common` pulls the latest copy, `just check-common` reports when this one differs.
+Put project-specific commands in the root `Justfile` rather than editing the copy; see `AGENTS.md`.
 
 ## Release flow
 

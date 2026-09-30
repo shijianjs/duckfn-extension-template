@@ -34,6 +34,12 @@ make debug               # 官方模板那条路，CI 也走它
 | `just docs_build` / `just docs_start` | 构建 / 本地预览这份文档站 |
 | `just rename <名字>` | 一次改齐扩展名 |
 | `just release_*` | 下面那套发版流程 |
+| `just sync-common` / `just check-common` | 更新 / 比对 `scripts/common.just`（见下） |
+
+上面这些 recipe 都在 `scripts/common.just` 里 —— 那是所有扩展项目共享的一份文件，由根 `Justfile`
+`import` 进来（`just --list` 看到的是合并后的全集）。它的源在 duckfn 仓库：`just sync-common` 拉回
+最新副本，`just check-common` 在副本不一致时报错。本项目特有的命令写进根 `Justfile`，不要去改副本；
+细节见 `AGENTS.md`。
 
 ## 发版流程
 
