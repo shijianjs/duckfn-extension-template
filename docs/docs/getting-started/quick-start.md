@@ -25,7 +25,7 @@ flowchart LR
   cargo install just cargo-duckdb-ext-tools
   ```
 
-- A **DuckDB** binary 1.5 or newer (`duckdb` on `PATH`, or point at it with
+- A **DuckDB** binary 1.3 or newer (`duckdb` on `PATH`, or point at it with
   `just DUCKDB=/path/to/duckdb …`).
 - Optional: **make** (inside Git Bash on Windows) and Python for the official build/test flow the CI
   uses — `just ci-build` and `just test` need them, the cargo path does not.

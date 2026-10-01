@@ -122,17 +122,18 @@ community-extension/    社区扩展注册的两份文件与流程说明
 
 ## 依赖
 
-- [duckfn](https://crates.io/crates/duckfn)：属性宏，把普通 Rust 函数注册成 DuckDB 函数。依赖开了
-  `all`（= `duckdb-1-5` + `cli` + `chrono` + `uuid` + `rust_decimal`）：`duckdb-1-5` 是 DuckDB 1.5 才
-  进 C API 的能力，`cli` 是 `src/bin/duckfn.rs` 用的命令行工具（给 duckfn 带上 clap 与 csv）。它**不含**
-  `owned-connection`（宿主文件系统 `duckfn::duck_vfs` 挂在那一档上，要用得显式加）。属性宏还会为每个
-  签名生成 `SQL_NAME` 常量；属性上的 `description` / `comment` / `example` 则是函数描述 CSV 的唯一来源
-  （见下）。
+- [duckfn](https://crates.io/crates/duckfn)：属性宏，把普通 Rust 函数注册成 DuckDB 函数。只开了实际
+  用到的那个 feature（`cli`，即 `src/bin/duckfn.rs` 用的命令行工具，给 duckfn 带上 clap 与 csv）。
+  刻意不用 `all`：它顺带打开 `duckdb-1-5`（= quack-rs 的同一个开关），也就是 C API 的**不稳定区**
+  （COPY 函数、宿主 VFS、标量 bind/init 那些槽位），而本模板只用稳定区 —— 关上它产物才跨 DuckDB 发行版
+  可用。`chrono` / `uuid` / `rust_decimal` 的互转是 ABI 中立的，用到时再打开；宿主文件系统
+  `duckfn::duck_vfs` 挂在 `owned-connection` 那一档、落在不稳定区，本模板不需要。属性宏还会为每个签名生成
+  `SQL_NAME` 常量；属性上的 `description` / `comment` / `example` 则是函数描述 CSV 的唯一来源（见下）。
 - [quack-rs](https://crates.io/crates/quack-rs)：DuckDB C API 绑定，`duckfn_entrypoint!` 展开出的代码
   直接引用它。
 - [libduckdb-sys](https://crates.io/crates/libduckdb-sys)：只取头文件，开启 `loadable-extension`，
   因此**不需要在本地编译 DuckDB**。版本下限 `>=1.10500`（= DuckDB 1.5.0：这个 crate 把 DuckDB 版本
-  编码成 `1.<major*10000 + minor*100 + patch>.0`，1.5.5 就是 `1.10505.0`）。
+  编码成 `1.<major*10000 + minor*100 + patch>.0`，1.5.6 就是 `1.10506.0`）。
 
 示例函数没有用到别的依赖。要做时间/日期相关的功能，再打开 duckfn 的 `chrono` feature 并把 `chrono`
 加成依赖（duckfn 不 re-export 它）；Cargo.toml 末尾有写好的两行例子。

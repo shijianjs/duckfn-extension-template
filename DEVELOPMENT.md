@@ -138,18 +138,20 @@ is in it. Write them from duckfn's docs and example extension rather than from m
 ## Dependencies
 
 - [duckfn](https://crates.io/crates/duckfn): the attribute macros that register ordinary Rust functions
-  with DuckDB. The dependency turns on `all` (= `duckdb-1-5` + `cli` + `chrono` + `uuid` +
-  `rust_decimal`): `duckdb-1-5` is what only reached the C API in DuckDB 1.5, `cli` the command-line
-  tool behind `src/bin/duckfn.rs` (which pulls clap and csv into duckfn). It does **not** include
-  `owned-connection`, the feature that gates the host file system (`duckfn::duck_vfs`) — enable it
-  explicitly when you need it. The macros also generate a `SQL_NAME` constant per signature, and the
-  `description` / `comment` / `example` attributes are the one source of the function-description CSV
-  (see below).
+  with DuckDB. Only the one feature actually used is on (`cli`, the command-line tool behind
+  `src/bin/duckfn.rs`, which pulls clap and csv into duckfn). `all` is deliberately avoided: it also
+  turns on `duckdb-1-5` (= the same switch in quack-rs), i.e. the **unstable region** of the C API
+  (copy functions, the host VFS, the scalar bind/init slots), while this template stays in the stable
+  region — and that is what makes one binary portable across DuckDB releases. The `chrono` / `uuid` /
+  `rust_decimal` conversions are ABI-neutral and can be turned on when needed; `owned-connection`
+  (which gates the host file system `duckfn::duck_vfs`) sits in the unstable region and is not needed.
+  The macros also generate a `SQL_NAME` constant per signature, and the `description` / `comment` /
+  `example` attributes are the one source of the function-description CSV (see below).
 - [quack-rs](https://crates.io/crates/quack-rs): the DuckDB C API bindings — the code expanded by
   `duckfn_entrypoint!` refers to them directly.
 - [libduckdb-sys](https://crates.io/crates/libduckdb-sys): headers only, with `loadable-extension`, which
   is what keeps a local DuckDB build unnecessary. The lower bound is `>=1.10500` (= DuckDB 1.5.0: the
-  crate encodes a DuckDB version as `1.<major*10000 + minor*100 + patch>.0`, so 1.5.5 is `1.10505.0`).
+  crate encodes a DuckDB version as `1.<major*10000 + minor*100 + patch>.0`, so 1.5.6 is `1.10506.0`).
 
 The sample functions need nothing else. For anything date/time related, enable duckfn's `chrono` feature
 and add `chrono` as a dependency (duckfn re-exports none of those crates); the two ready-made lines are

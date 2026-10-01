@@ -178,8 +178,8 @@ function badges(repoUrl: string): HeroBadge[] {
     },
     {
       href: 'https://duckdb.org',
-      src: 'https://img.shields.io/badge/DuckDB-1.5%2B-14459b.svg?style=flat',
-      alt: 'DuckDB 1.5 or newer',
+      src: 'https://img.shields.io/badge/DuckDB-1.3%2B-14459b.svg?style=flat',
+      alt: 'DuckDB 1.3 or newer',
     },
   ];
 }

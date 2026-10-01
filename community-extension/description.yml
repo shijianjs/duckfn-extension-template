@@ -32,6 +32,7 @@ docs:
     | `my_sum(value)` | aggregate | `DOUBLE` -> `DOUBLE`, NULLs skipped |
 
     Then the details that do not fit a table: NULL semantics, the options a function takes, what it does
-    with the file system or the network, and which DuckDB version it needs (this template needs **1.5 or
-    newer** — the project is built against v1.5.5). Development notes and the full option table live in
-    the repository: <https://github.com/owner/repo>.
+    with the file system or the network, and which DuckDB version it needs. Requires **DuckDB 1.3 or
+    newer**: the extension is built against DuckDB 1.5.6 headers but declares the C API floor it needs
+    (v1.2.0), so one binary loads into 1.3.2 through 1.5.6 alike. Development notes and the full option
+    table live in the repository: <https://github.com/owner/repo>.

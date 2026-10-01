@@ -24,7 +24,7 @@ flowchart LR
   cargo install just cargo-duckdb-ext-tools
   ```
 
-- 一个 **DuckDB** 1.5 或更新的可执行文件（`duckdb` 在 `PATH` 里，或者用
+- 一个 **DuckDB** 1.3 或更新的可执行文件（`duckdb` 在 `PATH` 里，或者用
   `just DUCKDB=/path/to/duckdb …` 指定）。
 - 可选：**make**（Windows 上要在 Git Bash 里跑）与 Python —— CI 用的那套官方构建 / 测试流程需要它们，
   cargo 那条路不需要。

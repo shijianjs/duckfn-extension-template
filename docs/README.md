@@ -110,8 +110,11 @@ Two more things worth knowing:
   asset's sha256 changes. Both `.cache/` and `static/duckdb-extensions/` are gitignored — a file placed
   there by hand needs `git add -f`.
 
-The extension is built by CI for DuckDB v1.5.5; the kit pins `@duckdb/duckdb-wasm` to the exact dev
-build whose engine matches. When either side moves, re-check that the live blocks still run.
+The extension is built by CI for DuckDB v1.5.6, and the preloaded wasm build is a stable-C-API
+extension declaring a v1.2.0 floor — so the engine the kit pins (and anything newer) accepts it.
+The engine side is held there by the `overrides` entry in `docs/package.json`, which forces
+`@duckdb/duckdb-wasm` (a transitive dependency of `duckfn-docs-kit`) to `1.33.1-dev65.0`. When either
+side moves, re-check that the live blocks still run.
 
 ## Testing the examples
 
