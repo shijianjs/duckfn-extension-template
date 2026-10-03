@@ -1,7 +1,7 @@
 ---
 title: Build and release
 sidebar_position: 4
-description: The two build paths, the Justfile commands, the release flow that produces GitHub Release binaries, and the WebAssembly target.
+description: The official make build path, the Justfile commands, the release flow that produces GitHub Release binaries, and the WebAssembly target.
 ---
 
 # Build and release

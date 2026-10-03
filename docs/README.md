@@ -15,7 +15,7 @@ if you would rather not have a site (nothing else in the repository depends on i
 | `docs/intro.md` | Introduction. The only page with a `slug`, so `/docs/intro` stays stable. |
 | `docs/getting-started/` | Renaming the template, building and loading it, and the project layout. |
 | `docs/guide/` | The sample functions line by line, and how to test your own. |
-| `docs/build-and-release.md`, `docs/community-extension.md` | The `Development guide` sidebar and navbar entry: the two build paths, the release flow, the wasm target, and publishing to DuckDB's community extensions. |
+| `docs/build-and-release.md`, `docs/community-extension.md` | The `Development guide` sidebar and navbar entry: the official build path, the release flow, the wasm target, and publishing to DuckDB's community extensions. |
 | `i18n/zh-Hans/` | Simplified Chinese translations of all of the above, plus the UI strings. |
 | `src/pages/index.tsx` | Home page: hero, feature cards, the Rust/SQL showcase and the "where to go next" cards. The hero, the feature grid and the next-step cards are `<dfk-*>` custom elements from [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit), mounted through callback refs and fed with the imperative `translate()` API; every string still has an entry in `i18n/zh-Hans/code.json` under `homepage.*`. The code showcase stays here because it needs the theme's `CodeBlock`. |
 | `src/pages/index.module.css` | The code showcase's styles. The hero, feature grid and cards carry their own styles inside the kit's shadow DOM, so they are not here. |

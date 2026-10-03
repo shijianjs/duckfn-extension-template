@@ -63,5 +63,5 @@ FROM (VALUES ('world'), ('')) t(name);
   一起的命名规则。
 - [编写函数](./guide/functions.md) —— 示例函数逐行拆解。
 - [测试](./guide/testing.md) —— SQLLogicTest 用例与怎么跑。
-- [构建与发版](./build-and-release.md) —— 两条构建路径与发版流程。
+- [构建与发版](./build-and-release.md) —— 官方构建与发版流程。
 - [社区扩展](./community-extension.md) —— 发布到 DuckDB 的社区仓。
