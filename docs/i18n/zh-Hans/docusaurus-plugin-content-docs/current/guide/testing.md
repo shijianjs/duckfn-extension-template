@@ -47,14 +47,14 @@ DuckDB 的测试运行器可以直接驱动产物，完全跳过 `make`。它需
 # Linux / macOS
 ./configure/venv/bin/python -m duckdb_sqllogictest \
     --test-dir test/sql \
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 ```powershell
 # Windows
 .\configure\venv\Scripts\python.exe -m duckdb_sqllogictest `
     --test-dir test/sql `
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 `--test-dir` 必给：它同时是 `__TEST_DIR__` 的取值，也就是会落盘写文件的用例拿到的目录。只跑一份就再加

@@ -6,38 +6,32 @@ description: 两条构建路径、Justfile 命令、产出 GitHub Release 产物
 
 # 构建与发版
 
-## 两条构建路径
+## 构建
 
-两条都保留着，按手头的事选快的那条。
+构建走官方 DuckDB `extension-ci-tools` makefile，`just build` 把它包了一层：
 
 ```shell
-cargo duckdb-ext build   # 日常迭代，不需要 make
-# -> target/debug/my_extension.duckdb_extension
-
 make configure           # 只做一次：建 configure/venv（Python 与 sqllogictest 运行器）
-make debug               # 官方模板那条路，CI 也走它
-# -> build/debug/extension/my_extension/my_extension.duckdb_extension
+make debug               # 官方路径，CI 也走它
+# -> build/debug/my_extension.duckdb_extension
 ```
 
-两条路径，以及各自把产物放在哪：
+产物落在哪里、又是怎么加载的：
 
 ```mermaid
 flowchart LR
-    src["Rust 源码"] --> cargo["cargo duckdb-ext build"]
-    src --> make["make debug<br/>官方路径，CI 也走它"]
-    cargo --> out1["target/debug/<br/>扩展名.duckdb_extension"]
-    make --> out2["build/debug/extension/<br/>扩展名.duckdb_extension"]
-    out1 --> load["在 DuckDB 里 LOAD"]
-    out2 --> load
+    src["Rust 源码"] --> make["make debug<br/>官方路径，CI 也走它"]
+    make --> out["build/debug/<br/>扩展名.duckdb_extension"]
+    out --> load["在 DuckDB 里 LOAD"]
 ```
 
-`make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
+`just build` 跑的是 `make configure && make debug`。`make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
 
 ## Justfile
 
 | 命令 | 做什么 |
 | --- | --- |
-| `just build` | `cargo duckdb-ext build` |
+| `just build` | `make configure && make debug` |
 | `just sql "SELECT my_greet('world')"` | 先构建，再跑一条语句就退出 |
 | `just repl` | 已 LOAD 扩展的 DuckDB REPL |
 | `just lint` | `cargo clippy --all-targets -- -D warnings` |

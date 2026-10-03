@@ -49,14 +49,14 @@ Python environment with `duckdb_sqllogictest` installed — `make configure` cre
 # Linux / macOS
 ./configure/venv/bin/python -m duckdb_sqllogictest \
     --test-dir test/sql \
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 ```powershell
 # Windows
 .\configure\venv\Scripts\python.exe -m duckdb_sqllogictest `
     --test-dir test/sql `
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 `--test-dir` is required: it is also the value of `__TEST_DIR__`, the directory a test writing files is

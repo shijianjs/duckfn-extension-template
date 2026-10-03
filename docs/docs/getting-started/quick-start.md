@@ -1,7 +1,7 @@
 ---
 title: Quick start
 sidebar_position: 1
-description: Rename the extension, build the .duckdb_extension with cargo, load it into DuckDB and call the sample functions.
+description: Rename the extension, build the .duckdb_extension with the official make toolchain, load it into DuckDB and call the sample functions.
 ---
 
 # Quick start
@@ -18,17 +18,17 @@ flowchart LR
 ## Prerequisites
 
 - **Rust** 1.86 or newer (`rust-version` in `Cargo.toml`).
-- **[just](https://github.com/casey/just)** and **cargo-duckdb-ext-tools** — the two tools the recipes
-  call:
+- **[just](https://github.com/casey/just)** — the tool the recipes call:
 
   ```shell
-  cargo install just cargo-duckdb-ext-tools
+  cargo install just
   ```
 
+- **make** (inside Git Bash on Windows) and **Python 3** — the official DuckDB
+  `extension-ci-tools` build/test flow, which `just build` runs under the hood (`make configure` +
+  `make debug`). `just test` uses the same flow.
 - A **DuckDB** binary 1.3 or newer (`duckdb` on `PATH`, or point at it with
   `just DUCKDB=/path/to/duckdb …`).
-- Optional: **make** (inside Git Bash on Windows) and Python for the official build/test flow the CI
-  uses — `just ci-build` and `just test` need them, the cargo path does not.
 
 ## 1. Rename the extension
 
@@ -45,10 +45,10 @@ functions are the main item.
 ## 2. Build
 
 ```shell
-just build          # = cargo duckdb-ext build
+just build          # = make configure && make debug
 ```
 
-The artifact is `target/debug/my_extension.duckdb_extension`. There is no C++ step and no local DuckDB
+The artifact is `build/debug/my_extension.duckdb_extension`. There is no C++ step and no local DuckDB
 build: the extension is compiled against DuckDB's headers and dispatches through its API table when it
 is loaded.
 
@@ -60,7 +60,7 @@ just repl           # a DuckDB REPL with the extension already loaded
 
 ```sql
 -- or by hand; -unsigned is required for a locally built extension
-duckdb -unsigned -c "LOAD './target/debug/my_extension.duckdb_extension';"
+duckdb -unsigned -c "LOAD './build/debug/my_extension.duckdb_extension';"
 ```
 
 The sample functions, running right here — the site preloads the extension from the repository's latest
@@ -98,7 +98,7 @@ just sql "SELECT my_greet('world')"
 just test           # make configure + make debug + make test
 ```
 
-The faster loop (no `make`, no Python venv of its own) is in [Testing](../guide/testing.md).
+The faster loop is in [Testing](../guide/testing.md).
 
 ## Traps
 
@@ -114,8 +114,7 @@ The faster loop (no `make`, no Python venv of its own) is in [Testing](../guide/
 
 :::
 
-One more, on Windows: if `cargo duckdb-ext build` reports the artifact is in use, a DuckDB process is
-holding `target/debug/my_extension.duckdb_extension`. Build to another path instead —
-`cargo duckdb-ext build -o build/debug/my_extension.duckdb_extension` — or close that process. A
-`.duckdb_extension` is not a renamed DLL: DuckDB's metadata lives at the end of the file, so copying
-a DLL over it produces `The metadata at the end of the file is invalid`.
+One more, on Windows: if `make debug` reports the artifact is in use, a DuckDB process is
+holding `build/debug/my_extension.duckdb_extension` (usually a `just repl` left open) — close that
+process and rebuild. A `.duckdb_extension` is not a renamed DLL: DuckDB's metadata lives at the end of
+the file, so copying a DLL over it produces `The metadata at the end of the file is invalid`.

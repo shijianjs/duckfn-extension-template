@@ -29,15 +29,15 @@ just rename my_new_extension
 ## 快速上手
 
 ```shell
-cargo install cargo-duckdb-ext-tools   # 只需一次：全局 cargo 子命令，不给项目加依赖
-cargo duckdb-ext build                 # -> target/debug/my_extension.duckdb_extension
+make configure   # 只做一次：建 configure/venv（Python 与 sqllogictest 运行器）
+make debug       # -> build/debug/my_extension.duckdb_extension
 ```
 
 自己构建的产物没有签名，加载时必须给 DuckDB 加 `-unsigned`：
 
 ```shell
 duckdb -unsigned -c "
-LOAD './target/debug/my_extension.duckdb_extension';
+LOAD './build/debug/my_extension.duckdb_extension';
 SELECT my_greet('world');
 -- Hello, world!
 SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
@@ -68,16 +68,16 @@ SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
 
 ## 从源码构建
 
-两条构建路径，有意保持一致：
+构建走官方 DuckDB `extension-ci-tools` makefile：
 
 ```shell
-cargo duckdb-ext build   # 日常迭代，不需要 make -> target/debug/my_extension.duckdb_extension
 make configure           # 只做一次：建 configure/venv（Python 与 sqllogictest 运行器）
-make debug               # 官方模板那条路 -> build/debug/extension/my_extension/...
+make debug               # -> build/debug/my_extension.duckdb_extension
 ```
 
 `make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
-`Justfile` 把两者都包了一层（`just build`、`just ci-build`、`just test`、`just ci-release`）。
+`Justfile` 把它包了一层（`just build` = `make configure && make debug`、`just ci-build`、`just test`、
+`just ci-release`）。
 
 ## 测试
 
@@ -89,7 +89,7 @@ just ci-build      # 只做官方构建，不跑测试
 ```
 
 `make test` 不会自动重新构建，改完 Rust 先跑 `just ci-build`（或 `make debug`）。
-更快的迭代方式（拿运行器直接跑 `target/debug/*.duckdb_extension`）与各测试文件覆盖什么，
+更快的迭代方式（拿运行器直接跑 `build/debug/*.duckdb_extension`）与各测试文件覆盖什么，
 见 [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md)。
 
 ## WebAssembly

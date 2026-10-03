@@ -31,15 +31,15 @@ Replacing the two sample functions with your own API is one of them.
 ## Quick start
 
 ```shell
-cargo install cargo-duckdb-ext-tools   # once: a global cargo subcommand, no project dependency
-cargo duckdb-ext build                 # -> target/debug/my_extension.duckdb_extension
+make configure   # once: builds configure/venv (Python + the sqllogictest runner)
+make debug       # -> build/debug/my_extension.duckdb_extension
 ```
 
 Locally built extensions are unsigned, so DuckDB has to be started with `-unsigned`:
 
 ```shell
 duckdb -unsigned -c "
-LOAD './target/debug/my_extension.duckdb_extension';
+LOAD './build/debug/my_extension.duckdb_extension';
 SELECT my_greet('world');
 -- Hello, world!
 SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
@@ -71,16 +71,16 @@ Behaviour worth knowing, because it is duckfn's rule rather than this template's
 
 ## Build from source
 
-Two build paths, deliberately kept in sync:
+The official DuckDB `extension-ci-tools` makefiles are the build path:
 
 ```shell
-cargo duckdb-ext build   # fast loop, no make; -> target/debug/my_extension.duckdb_extension
 make configure           # once: builds configure/venv (Python + the sqllogictest runner)
-make debug               # the official template path; -> build/debug/extension/my_extension/...
+make debug               # -> build/debug/my_extension.duckdb_extension
 ```
 
 `make release` is the optimized version of the same flow. On Windows `make` has to run inside Git Bash.
-The `Justfile` wraps both (`just build`, `just ci-build`, `just test`, `just ci-release`).
+The `Justfile` wraps it (`just build` = `make configure && make debug`, `just ci-build`, `just test`,
+`just ci-release`).
 
 ## Testing
 
@@ -92,8 +92,8 @@ just ci-build      # just the official build, without running the tests
 ```
 
 `make test` does not rebuild, so run `just ci-build` (or `make debug`) first after touching Rust code.
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the faster iteration loop (running the runner straight against
-`target/debug/*.duckdb_extension`) and for what the test files cover.
+See [DEVELOPMENT.md](DEVELOPMENT.md) for the iteration loop (running the runner straight against
+`build/debug/*.duckdb_extension`) and for what the test files cover.
 
 ## WebAssembly
 

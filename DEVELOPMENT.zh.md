@@ -140,24 +140,19 @@ community-extension/    社区扩展注册的两份文件与流程说明
 
 ## 构建
 
-日常迭代用 `cargo-duckdb-ext-tools`（全局 cargo 子命令，不给项目加依赖）：
-
-```shell
-cargo install cargo-duckdb-ext-tools   # 只需安装一次
-cargo duckdb-ext build                 # -> target/debug/my_extension.duckdb_extension
-```
-
-官方模板那条 `make` 流程仍然保留（CI 与 sqllogictest 走它），首次需要 `make configure` 建 Python venv：
+构建走官方 DuckDB `extension-ci-tools` makefile，`just build` 把它包了一层。首次需要
+`make configure` 建 Python venv：
 
 ```shell
 make configure   # 只做一次
-make debug       # -> build/debug/extension/my_extension/my_extension.duckdb_extension
+make debug       # -> build/debug/my_extension.duckdb_extension
 ```
 
 `make release` 是带优化的同一套流程。Windows 上 `make` 需要在 Git Bash 里跑。
 
-仓库根目录的 `Justfile` 把两者都包了一层：`just build`、`just sql "SELECT …"`、`just repl`、
-`just test`、`just lint`、`just build_wasm`、`just docs_csv`、`just docs_build`。
+仓库根目录的 `Justfile` 把这条流程包了一层：`just build`（= `make configure && make debug`）、
+`just sql "SELECT …"`、`just repl`、`just test`、`just lint`、`just build_wasm`、`just docs_csv`、
+`just docs_build`。
 
 有一条容易踩的坑：**产物文件名必须是 `<扩展名>.duckdb_extension`**。DuckDB 是按文件名去找入口点符号
 的，改个名字（比如从 `my_extension.duckdb_extension` 改成 `win.duckdb_extension`）就会报
@@ -246,7 +241,7 @@ make debug && make test    # make test 不会自动重新构建，改完 Rust �
 # Windows（--test-dir 同时是 __TEST_DIR__ 的取值，必须给）
 .\configure\venv\Scripts\python.exe -m duckdb_sqllogictest `
     --test-dir test/sql `
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 # 只跑一份：再加 --file-path test/sql/scalar_greet.test
 ```
 
@@ -254,7 +249,7 @@ make debug && make test    # make test 不会自动重新构建，改完 Rust �
 # Linux / macOS
 ./configure/venv/bin/python -m duckdb_sqllogictest \
     --test-dir test/sql \
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 新增函数时至少覆盖：正常值、`NULL`、边界值、错误路径（`statement error`）。

@@ -159,25 +159,19 @@ at the bottom of Cargo.toml.
 
 ## Build
 
-The daily loop uses `cargo-duckdb-ext-tools` (a global cargo subcommand; it adds no project dependency):
-
-```shell
-cargo install cargo-duckdb-ext-tools   # once
-cargo duckdb-ext build                 # -> target/debug/my_extension.duckdb_extension
-```
-
-The official template's `make` flow is still there (CI and the sqllogictest run go through it); the first
-run needs `make configure` to build the Python venv:
+The official DuckDB `extension-ci-tools` makefiles are the build path, and `just build` wraps them.
+The first run needs `make configure` to build the Python venv:
 
 ```shell
 make configure   # once
-make debug       # -> build/debug/extension/my_extension/my_extension.duckdb_extension
+make debug       # -> build/debug/my_extension.duckdb_extension
 ```
 
 `make release` is the optimized version of the same flow. On Windows `make` has to run inside Git Bash.
 
-The `Justfile` at the repository root wraps both: `just build`, `just sql "SELECT …"`, `just repl`,
-`just test`, `just lint`, `just build_wasm`, `just docs_csv`, `just docs_build`.
+The `Justfile` at the repository root wraps the flow: `just build` (= `make configure && make debug`),
+`just sql "SELECT …"`, `just repl`, `just test`, `just lint`, `just build_wasm`, `just docs_csv`,
+`just docs_build`.
 
 One easy trap: **the artifact file name must be `<extension name>.duckdb_extension`**. DuckDB looks the
 entry-point symbol up by that name, so a rename (from `my_extension.duckdb_extension` to
@@ -275,7 +269,7 @@ repository's own venv can drive the artifact directly:
 # Linux / macOS (--test-dir is also the value of __TEST_DIR__, so it is required)
 ./configure/venv/bin/python -m duckdb_sqllogictest \
     --test-dir test/sql \
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 # one file only: add --file-path test/sql/scalar_greet.test
 ```
 
@@ -283,7 +277,7 @@ repository's own venv can drive the artifact directly:
 # Windows
 .\configure\venv\Scripts\python.exe -m duckdb_sqllogictest `
     --test-dir test/sql `
-    --external-extension target/debug/my_extension.duckdb_extension
+    --external-extension build/debug/my_extension.duckdb_extension
 ```
 
 A new function should cover at least: ordinary values, `NULL`, boundary values, and the error path

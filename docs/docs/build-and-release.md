@@ -6,39 +6,33 @@ description: The two build paths, the Justfile commands, the release flow that p
 
 # Build and release
 
-## Two build paths
+## Build
 
-Both are kept in sync; use whichever is faster for what you are doing.
+The official DuckDB `extension-ci-tools` makefiles are the one path, and `just build` wraps it:
 
 ```shell
-cargo duckdb-ext build   # fast loop, no make
-# -> target/debug/my_extension.duckdb_extension
-
 make configure           # once: builds configure/venv (Python + the sqllogictest runner)
-make debug               # the official template path, also what CI runs
-# -> build/debug/extension/my_extension/my_extension.duckdb_extension
+make debug               # the official path, also what CI runs
+# -> build/debug/my_extension.duckdb_extension
 ```
 
-The two paths and where each one puts the artifact:
+Where the artifact lands and how it is loaded:
 
 ```mermaid
 flowchart LR
-    src["Rust sources"] --> cargo["cargo duckdb-ext build"]
-    src --> make["make debug<br/>official path, also CI"]
-    cargo --> out1["target/debug/<br/>extension.duckdb_extension"]
-    make --> out2["build/debug/extension/<br/>extension.duckdb_extension"]
-    out1 --> load["LOAD in DuckDB"]
-    out2 --> load
+    src["Rust sources"] --> make["make debug<br/>official path, also CI"]
+    make --> out["build/debug/<br/>my_extension.duckdb_extension"]
+    out --> load["LOAD in DuckDB"]
 ```
 
-`make release` is the optimized version of the same flow. On Windows `make` has to run inside Git
-Bash.
+`just build` runs `make configure && make debug`. `make release` is the optimized version of the same
+flow. On Windows `make` has to run inside Git Bash.
 
 ## Justfile
 
 | Command | What it does |
 | --- | --- |
-| `just build` | `cargo duckdb-ext build` |
+| `just build` | `make configure && make debug` |
 | `just sql "SELECT my_greet('world')"` | Build, then run one statement and exit |
 | `just repl` | A DuckDB REPL with the extension loaded |
 | `just lint` | `cargo clippy --all-targets -- -D warnings` |
