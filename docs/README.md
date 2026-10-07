@@ -39,8 +39,10 @@ if you would rather not have a site (nothing else in the repository depends on i
 4. `static/img/docusaurus-social-card.jpg` (the preview image) and `static/img/logo.svg`.
 5. The pages under `docs/docs/` and their translations under
    `i18n/zh-Hans/docusaurus-plugin-content-docs/current/`.
-6. Optional: search. See the commented `algolia` block in `docusaurus.config.ts`; DocSearch is free but
-   needs an index (https://docsearch.algolia.com/apply).
+6. Search is built in: `@easyops-cn/docusaurus-search-local` (registered under `themes` in
+   `docusaurus.config.ts`) indexes the pages at build time — one lunr index per locale, in a
+   hash-named file served from this deployment. No account, API key or index application, and
+   nothing to configure.
 7. One-time setup in the repository: Settings → Pages → Build and deployment → Source:
    **GitHub Actions**.
 
