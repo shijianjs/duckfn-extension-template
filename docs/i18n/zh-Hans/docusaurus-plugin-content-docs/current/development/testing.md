@@ -1,6 +1,6 @@
 ---
 title: 测试
-sidebar_position: 2
+sidebar_position: 4
 description: test/sql 下的 SQLLogicTest 用例、三种跑法（make、just 或直接调运行器），以及新增函数至少该覆盖什么。
 ---
 

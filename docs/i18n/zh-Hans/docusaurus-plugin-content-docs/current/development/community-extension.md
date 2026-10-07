@@ -1,6 +1,6 @@
 ---
 title: 社区扩展
-sidebar_position: 5
+sidebar_position: 6
 description: 把扩展注册进 DuckDB 社区仓：需要哪两份文件、每个字段填什么，以及每次发版怎么让它跟上。
 ---
 

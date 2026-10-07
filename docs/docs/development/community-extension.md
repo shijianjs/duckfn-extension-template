@@ -1,6 +1,6 @@
 ---
 title: Community extensions
-sidebar_position: 5
+sidebar_position: 6
 description: Registering the extension in DuckDB's community repository — the two files it takes, what each field means, and how to keep them in step with a release.
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Build and release
-sidebar_position: 4
+sidebar_position: 5
 description: The official make build path, the Justfile commands, the release flow that produces GitHub Release binaries, and the WebAssembly target.
 ---
 

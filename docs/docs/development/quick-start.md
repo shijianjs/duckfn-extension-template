@@ -98,7 +98,7 @@ just sql "SELECT my_greet('world')"
 just test           # make configure + make debug + make test
 ```
 
-The faster loop is in [Testing](../guide/testing.md).
+The faster loop is in [Testing](./testing.md).
 
 ## Traps
 

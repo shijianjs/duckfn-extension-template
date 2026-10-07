@@ -189,9 +189,15 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
   要把 `REPO_URL` 改成自己的仓库（`just rename` 只改扩展名，不动这个 URL）。不需要这套能力时，把
   `docusaurus.config.ts` 里的 `remarkRunnableSql` 与 `dfkExtensions` 两行去掉即可。
 
-站点分成两个侧边栏、对应顶栏两项（见 `docs/sidebars.ts`）：**用户指南**（`intro` + `getting-started/` +
-`guide/`，讲怎么写这个扩展）与**开发指南**（`build-and-release`、`community-extension`，讲怎么构建、测试
-与发布它）。新增页面按这个归属放，两侧的文档树要各自翻译一份。
+站点分成两个侧边栏、对应顶栏两项（见 `docs/sidebars.ts`），**目录名就是受众**：
+
+- **用户指南**（`docs/docs/user-guide/`）—— 面向用 SQL 调用这个扩展的人：它给 DuckDB 加了什么、怎么
+  装与加载、注册了哪些函数。**不出现 Rust 与构建步骤**。
+- **开发指南**（`docs/docs/development/`）—— 面向改这个仓库的人：快速开始、目录结构、写函数与测试、
+  构建与发版、社区扩展注册。
+
+新增页面按这个归属放进对应目录，两侧的文档树要各自翻译一份。首页（`docs/src/pages/index.tsx`）同样
+面向用户：不展示 Rust 源码，讲的是安装与函数。
 
 ### 社区扩展注册
 

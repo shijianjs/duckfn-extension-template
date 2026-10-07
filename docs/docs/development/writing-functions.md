@@ -1,6 +1,6 @@
 ---
 title: Writing functions
-sidebar_position: 1
+sidebar_position: 3
 description: The sample scalar and aggregate functions line by line, the rules duckfn applies to arguments and return values, and what to copy when you add your own.
 ---
 
@@ -141,7 +141,7 @@ aggregate chapter of the duckfn guide for the shapes it supports.
 
    DuckDB's C extension API has no way to set a description or an example, so this text is the only
    source for the `Added Functions` table on the community-extension page. `just docs_csv` exports it
-   to `target/function_descriptions.csv` (see [Community extensions](../community-extension.md)).
+   to `target/function_descriptions.csv` (see [Community extensions](./community-extension.md)).
    Write it in English — it is pasted onto that page as it is.
 5. **Cover it with a test** (see [Testing](./testing.md)) and run `just lint`.
 

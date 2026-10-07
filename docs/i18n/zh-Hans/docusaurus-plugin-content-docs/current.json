@@ -2,21 +2,5 @@
   "version.label": {
     "message": "下一版",
     "description": "The label for version current"
-  },
-  "sidebar.userGuide.category.Getting started": {
-    "message": "入门",
-    "description": "The label for category 'Getting started' in sidebar 'userGuide'"
-  },
-  "sidebar.userGuide.category.Getting started.link.generated-index.description": {
-    "message": "改扩展名、构建并加载，然后在 SQL 里调用示例函数。",
-    "description": "The generated-index page description for category 'Getting started' in sidebar 'userGuide'"
-  },
-  "sidebar.userGuide.category.Guide": {
-    "message": "指南",
-    "description": "The label for category 'Guide' in sidebar 'userGuide'"
-  },
-  "sidebar.userGuide.category.Guide.link.generated-index.description": {
-    "message": "示例函数逐行拆解，以及写自己的函数与测试时该抄哪一段。",
-    "description": "The generated-index page description for category 'Guide' in sidebar 'userGuide'"
   }
 }

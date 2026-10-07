@@ -68,7 +68,7 @@ const baseUrl = process.env.DOCS_BASE_URL ?? '/';
 
 const config: Config = {
   title: 'my_extension',
-  tagline: 'A DuckDB extension written in Rust',
+  tagline: 'Extra SQL functions for DuckDB',
   favicon: 'img/logo.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -224,10 +224,10 @@ const config: Config = {
         src: 'img/logo.svg',
       },
       items: [
-        // 顶栏两项 = 两个侧边栏（见 sidebars.ts）：怎么写这个扩展 / 怎么构建、测试与发布它。
+        // 顶栏两项 = 两个侧边栏（见 sidebars.ts）：用这个扩展（装插件、调函数）/ 开发这个仓库。
         //
-        // Two navbar entries, one per sidebar (see sidebars.ts): writing the extension, and
-        // building/testing/releasing it.
+        // Two navbar entries, one per sidebar (see sidebars.ts): using the extension from SQL, and
+        // working on this repository.
         {
           type: 'docSidebar',
           sidebarId: 'userGuide',
@@ -264,25 +264,46 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
+      // 三栏对应站点的两半：用这个扩展（用户指南）/ 开发这个仓库（开发指南）/ 外部链接。
+      //
+      // Three columns mirroring the site's two halves: using the extension, working on the
+      // repository, and the external links.
       links: [
         {
-          title: 'Docs',
+          title: 'User guide',
           items: [
             {
               label: 'Introduction',
               to: '/docs/intro',
             },
             {
-              label: 'Quick start',
-              to: '/docs/getting-started/quick-start',
+              label: 'Installation',
+              to: '/docs/user-guide/installation',
             },
             {
               label: 'Functions',
-              to: '/docs/guide/functions',
+              to: '/docs/user-guide/functions',
+            },
+          ],
+        },
+        {
+          title: 'Development guide',
+          items: [
+            {
+              label: 'Quick start',
+              to: '/docs/development/quick-start',
+            },
+            {
+              label: 'Project structure',
+              to: '/docs/development/project-structure',
             },
             {
               label: 'Build and release',
-              to: '/docs/build-and-release',
+              to: '/docs/development/build-and-release',
+            },
+            {
+              label: 'Community extensions',
+              to: '/docs/development/community-extension',
             },
           ],
         },

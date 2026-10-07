@@ -95,7 +95,7 @@ just sql "SELECT my_greet('world')"
 just test           # make configure + make debug + make test
 ```
 
-更快的迭代方式见[测试](../guide/testing.md)。
+更快的迭代方式见[测试](./testing.md)。
 
 ## 几个坑
 

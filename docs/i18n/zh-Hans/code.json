@@ -330,7 +330,7 @@
     "message": "开始使用"
   },
   "homepage.tagline": {
-    "message": "用 Rust 编写的 DuckDB 扩展",
+    "message": "给 DuckDB 补充 SQL 函数",
     "description": "The tagline shown on the homepage hero"
   },
   "homepage.github": {
@@ -338,107 +338,107 @@
     "description": "Home page button linking to the repository"
   },
   "homepage.features.title": {
-    "message": "模板给了你什么",
+    "message": "my_extension 能给你什么",
     "description": "Home page section title above the feature cards"
   },
-  "homepage.features.noGlue.title": {
-    "message": "无需 C/C++ 胶水代码",
+  "homepage.features.sql.title": {
+    "message": "直接用 SQL 调用",
     "description": "Home page feature card title"
   },
-  "homepage.features.noGlue.details": {
-    "message": "一个属性宏就把普通 Rust 函数变成 DuckDB 的标量 / 聚合 / 表函数，DuckDB 的 C 类型不会出现在你的代码里。",
+  "homepage.features.sql.details": {
+    "message": "my_greet、my_greet_checked 与 my_sum 就是普通的 DuckDB 函数：放进任意查询，和内置函数一起用，调用处不需要 import 任何东西。",
     "description": "Home page feature card description"
   },
-  "homepage.features.build.title": {
-    "message": "无需本地编译 DuckDB",
+  "homepage.features.install.title": {
+    "message": "一行装好",
     "description": "Home page feature card title"
   },
-  "homepage.features.build.details": {
-    "message": "只用头文件、加载时通过 DuckDB 的 API 表分发，所以一条 cargo 命令就能出 .duckdb_extension —— 不需要 CMake，也不需要 C++ 工具链。",
+  "homepage.features.install.details": {
+    "message": "INSTALL my_extension FROM community; 再 LOAD my_extension; —— 构建签过名、且与你的 DuckDB 版本和平台匹配，所以不用加 -unsigned。",
     "description": "Home page feature card description"
   },
-  "homepage.features.tests.title": {
-    "message": "每个 PR 都跑测试",
+  "homepage.features.platforms.title": {
+    "message": "每个版本都有各平台产物",
     "description": "Home page feature card title"
   },
-  "homepage.features.tests.details": {
-    "message": "test/sql 下已经有三份 SQLLogicTest 用例，CI 会为每个支持的平台构建并运行它们。",
+  "homepage.features.platforms.details": {
+    "message": "每个版本都会把各平台各一份 .duckdb_extension 挂到 GitHub Release 上，LOAD 可以直接按 URL 取，中间不用先下载。",
     "description": "Home page feature card description"
   },
-  "homepage.features.release.title": {
-    "message": "打个 tag 就有各平台产物",
+  "homepage.features.versions.title": {
+    "message": "DuckDB 1.3 或更新",
     "description": "Home page feature card title"
   },
-  "homepage.features.release.details": {
-    "message": "提版本号、提交、打 tag 就够了：流水线会为所有平台构建，并把 .duckdb_extension 挂到 GitHub Release 上。",
+  "homepage.features.versions.details": {
+    "message": "基于 DuckDB 的 C 扩展 API 构建，一个二进制就能加载进 DuckDB 1.3 及之后的版本，不需要重新编译。",
     "description": "Home page feature card description"
   },
-  "homepage.features.types.title": {
-    "message": "普通 Rust 类型",
+  "homepage.features.examples.title": {
+    "message": "例子就地能跑",
     "description": "Home page feature card title"
   },
-  "homepage.features.types.details": {
-    "message": "Option、Vec、IndexMap 以及派生的结构体与枚举，对应 DuckDB 的 LIST、MAP、ARRAY 与 STRUCT —— 嵌套也支持。",
+  "homepage.features.examples.details": {
+    "message": "本站每个例子都在你的浏览器里用 DuckDB-Wasm 真跑 —— 在函数页点一下「执行」就能看到真实结果。",
     "description": "Home page feature card description"
   },
-  "homepage.features.docs.title": {
-    "message": "这份文档站",
+  "homepage.features.license.title": {
+    "message": "MIT 许可",
     "description": "Home page feature card title"
   },
-  "homepage.features.docs.details": {
-    "message": "docs/ 下的 Docusaurus 站点，中英双语，并有工作流在每次版本 tag 时发布到 GitHub Pages。不需要就删掉。",
+  "homepage.features.license.details": {
+    "message": "以 MIT 许可开源：源码、测试与这些页面都在仓库里。",
     "description": "Home page feature card description"
   },
   "homepage.showcase.title": {
-    "message": "一个属性 = 一个 SQL 函数",
-    "description": "Home page section title above the Rust and SQL code blocks"
+    "message": "装一次，之后就在 SQL 里调用",
+    "description": "Home page section title above the SQL code blocks"
   },
   "homepage.showcase.lead": {
-    "message": "属性宏会生成 FFI 包装层、列的读写与注册代码。左边这段是安全的 Rust，和写普通库没什么区别 —— 它就是模板自带的示例，不是示意图。",
-    "description": "Home page paragraph introducing the Rust and SQL code blocks"
+    "message": "扩展加的就是一批普通的 SQL 函数，调用处不用 import 任何东西。左边装一次，右边就能在任何能写 DuckDB 函数的地方用它。",
+    "description": "Home page paragraph introducing the SQL code blocks"
   },
   "homepage.showcase.caption": {
-    "message": "注释就是每次调用的返回值。本地构建的产物要加 -unsigned 才能加载，因为扩展调用的是 DuckDB 的 C API。",
+    "message": "注释就是每次调用的返回值 —— 最后一行是对两行数据真实求和的结果。",
     "description": "Home page note under the SQL code block explaining the trailing comments"
   },
   "homepage.showcase.link": {
-    "message": "示例函数逐行拆解",
-    "description": "Home page link to the functions guide"
+    "message": "完整的函数参考",
+    "description": "Home page link to the function reference"
   },
   "homepage.next.title": {
     "message": "接下来去哪",
     "description": "Home page section title above the link cards"
   },
-  "homepage.next.quickStart.title": {
-    "message": "快速开始",
+  "homepage.next.intro.title": {
+    "message": "简介",
     "description": "Home page link card title"
   },
-  "homepage.next.quickStart.details": {
-    "message": "改扩展名、构建、在 SQL 里调用示例函数。",
+  "homepage.next.intro.details": {
+    "message": "一页说清 my_extension 给 DuckDB 加了什么。",
     "description": "Home page link card description"
   },
-  "homepage.next.structure.title": {
-    "message": "目录结构",
+  "homepage.next.installation.title": {
+    "message": "安装",
     "description": "Home page link card title"
   },
-  "homepage.next.structure.details": {
-    "message": "入口点、函数与 SQL 类型各自放在哪。",
+  "homepage.next.installation.details": {
+    "message": "社区仓、Release 文件，或者本地自己构建的产物。",
     "description": "Home page link card description"
   },
   "homepage.next.functions.title": {
-    "message": "编写函数",
+    "message": "函数",
     "description": "Home page link card title"
   },
   "homepage.next.functions.details": {
-    "message": "示例函数逐行拆解，以及新增函数时该抄哪一段。",
+    "message": "每个函数，配一个能就地跑的例子。",
     "description": "Home page link card description"
   },
-  "homepage.next.release.title": {
-    "message": "构建与发版",
+  "homepage.next.development.title": {
+    "message": "开发指南",
     "description": "Home page link card title"
   },
-  "homepage.next.release.details": {
-    "message": "两条构建路径、发版流程与 wasm 目标。",
+  "homepage.next.development.details": {
+    "message": "从源码构建、测试与发布这个扩展。",
     "description": "Home page link card description"
   }
 }

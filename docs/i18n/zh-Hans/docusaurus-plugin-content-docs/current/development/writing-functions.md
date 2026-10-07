@@ -1,6 +1,6 @@
 ---
 title: 编写函数
-sidebar_position: 1
+sidebar_position: 3
 description: 示例标量函数与聚合函数逐行拆解、duckfn 对入参与返回值的规则，以及新增函数时该抄哪一段。
 ---
 
@@ -130,7 +130,7 @@ impl DuckAggregateState for SumState {
    ```
 
    DuckDB 的 C 扩展 API 没有设置描述与示例的接口，所以这段文本是社区扩展页 `Added Functions` 表的唯一
-   来源。`just docs_csv` 会把它导出到 `target/function_descriptions.csv`（见[社区扩展](../community-extension.md)）。
+   来源。`just docs_csv` 会把它导出到 `target/function_descriptions.csv`（见[社区扩展](./community-extension.md)）。
    文案用英文写 —— 它会被原样贴到那个页面上。
 5. **补测试**（见[测试](./testing.md)），然后跑 `just lint`。
 

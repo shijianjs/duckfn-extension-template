@@ -1,6 +1,6 @@
 ---
 title: Testing
-sidebar_position: 2
+sidebar_position: 4
 description: The SQLLogicTest files in test/sql, how to run them (make, just, or the test runner directly), and what a new function should cover.
 ---
 

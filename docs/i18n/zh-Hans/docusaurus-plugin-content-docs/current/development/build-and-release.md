@@ -1,6 +1,6 @@
 ---
 title: 构建与发版
-sidebar_position: 4
+sidebar_position: 5
 description: 官方 make 构建路径、Justfile 命令、产出 GitHub Release 产物的发版流程，以及 WebAssembly 目标。
 ---
 
