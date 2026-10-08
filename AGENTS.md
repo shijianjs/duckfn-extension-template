@@ -171,7 +171,9 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
 `docs/` 是一份 Docusaurus 站点（英文 + 简体中文），**不是必须的**：不用就整个目录删掉，仓库里只有两处
 引用它 —— `.github/workflows/DeployDocs.yml` 与 Justfile 的 `docs_*` recipe —— 一起删掉即可。
 
-维护约定（目录、命令、翻译流程、部署、版本占位符）见 [`docs/README.md`](docs/README.md)。可复用的部件
+维护约定（目录、命令、翻译流程、部署、版本占位符）见 [`docs/README.md`](docs/README.md)；改可运行
+SQL 块前先读 [`docs/AGENTS.md`](docs/AGENTS.md)（块里哪些路径不能写死、怎么读 `static/` 下的数据）。
+可复用的部件
 来自 npm 上的 [`duckfn-docs-kit`](https://www.npmjs.com/package/duckfn-docs-kit)（首页 `<dfk-*>` 组件、
 目录折叠控件、版本占位符 remark 插件、可运行 SQL 块），站点里不再留副本，注册处见 `docusaurus.config.ts`。
 三条容易踩的：
@@ -336,6 +338,7 @@ just release_dev 0.1.1-dev.0
 
 - [`DEVELOPMENT.zh.md`](DEVELOPMENT.zh.md)（[英文](DEVELOPMENT.md)）：目录结构、骨架取舍、构建与测试。
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
+- [`docs/AGENTS.md`](docs/AGENTS.md)：改文档站（尤其可运行 SQL 块）时的约定与已知坑。
 - [`README.zh.md`](README.zh.md)（[英文](README.md)）：SQL 接口与使用说明。
 - [`scripts/release.sh`](scripts/release.sh) 与 [`scripts/rename.sh`](scripts/rename.sh)：
   `release_bump` / `release_dev` / `release_tag` 与改名的实际实现。
