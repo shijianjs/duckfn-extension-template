@@ -24,7 +24,8 @@ just rename my_new_extension
 `just rename` (that is, `scripts/rename.sh`) rewrites every place the extension name has to match — the
 crate name and `[[example]] name`, `EXTENSION_NAME` in the Makefile, the entry-point symbol, the Justfile,
 the CI workflow and the docs — and regenerates the `Cargo.lock` entry. It ends by printing the few things
-left for a human, all of them listed in [DEVELOPMENT.md](DEVELOPMENT.md) (next steps) and
+left for a human, all of them listed in the development guide's
+[quick start](docs/docs/development/quick-start.md) (next steps) and
 [AGENTS.md](AGENTS.md) (conventions, including the `{{PROJECT_GOAL}}` placeholder).
 Replacing the two sample functions with your own API is one of them.
 
@@ -92,8 +93,8 @@ just ci-build      # just the official build, without running the tests
 ```
 
 `make test` does not rebuild, so run `just ci-build` (or `make debug`) first after touching Rust code.
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the iteration loop (running the runner straight against
-`build/debug/*.duckdb_extension`) and for what the test files cover.
+The development guide's [testing](docs/docs/development/testing.md) page has the iteration loop (running
+the runner straight against `build/debug/*.duckdb_extension`) and what each test file covers.
 
 ## WebAssembly
 
@@ -142,7 +143,6 @@ makes it `INSTALL my_extension FROM community` instead; the two files that requi
 | File | What is in it |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | conventions, the duckfn knowledge map, the release flow |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | directory layout, skeleton trade-offs, build & test, docs export |
+| [docs/docs/development/](docs/docs/development/quick-start.md) | the development guide: directory layout, skeleton trade-offs, writing and testing functions, build & release (English and Simplified Chinese) |
 | [docs/README.md](docs/README.md) | the documentation site: layout, commands, translations, deployment |
-| [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md) | the same, in Chinese |
 | [README.zh.md](README.zh.md) | this file, in Chinese |

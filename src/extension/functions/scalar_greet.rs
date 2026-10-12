@@ -40,15 +40,15 @@ use duckfn::{DuckOptionResult, duck_error, duck_scalar_function};
 ///
 /// `description` / `comment` / `example` 不参与注册：属性宏只把它们连同注册名收进 inventory，供
 /// `just docs_csv` 导出 `target/function_descriptions.csv`（社区扩展文档页那张函数表的唯一来源，
-/// 见 DEVELOPMENT.md 的「函数描述」一节）。文案是**英文**，因为它会被原样贴进那个页面。
+/// 见开发指南的「社区扩展」一节）。文案是**英文**，因为它会被原样贴进那个页面。
 ///
 /// The simplest shape: one argument, one return value, one line of body.
 ///
 /// `description` / `comment` / `example` take no part in registration: the macro only collects them
 /// (together with the registered name) into an inventory entry so that `just docs_csv` can export
 /// `target/function_descriptions.csv` — the one source behind the function table of the
-/// community-extension doc page (see the "function descriptions" section of DEVELOPMENT.md). The text
-/// is **English** because it is pasted into that page as it is.
+/// community-extension doc page (see the "community extensions" page of the development guide). The
+/// text is **English** because it is pasted into that page as it is.
 #[duck_scalar_function(
     description = "Greets someone by name, the simplest possible scalar function",
     example = "SELECT my_greet('world')"
@@ -67,15 +67,15 @@ fn my_greet(name: String) -> String {
 ///
 /// 错误信息前缀手写成函数名（这里只有一处用到）。同一个名字要在好几个地方出现时（错误提示、日志、
 /// 提示文案），改读属性宏生成的 `SQL_NAME` 常量，别抄第二份字面量 —— 代价是函数得写成 `pub(super)`，
-/// 因为生成的模块沿用函数的可见性（见 DEVELOPMENT.md 的「设计取舍」）。
+/// 因为生成的模块沿用函数的可见性（见开发指南的「写函数」一节）。
 ///
 /// Nullable and fallible: an empty string becomes SQL NULL, surrounding whitespace is an error.
 ///
 /// The error prefix repeats the function name by hand because this is the only place that needs it.
 /// Once one name shows up in several places (error messages, logs, hints), read the macro-generated
 /// `SQL_NAME` constant instead of copying the literal — the price being that the function has to be
-/// `pub(super)`, since the generated module inherits the function's visibility (see the "design
-/// notes" section of DEVELOPMENT.md).
+/// `pub(super)`, since the generated module inherits the function's visibility (see the "writing
+/// functions" page of the development guide).
 #[duck_scalar_function(
     description = "Greets someone by name, returning NULL for an empty name and failing on whitespace",
     comment = "The nullable-and-fallible return shape: Ok(None) is SQL NULL, Err fails the query",

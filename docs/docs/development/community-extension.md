@@ -47,6 +47,15 @@ just docs_csv
 cp target/function_descriptions.csv community-extension/docs/function_descriptions.csv
 ```
 
+To see which functions are missing from the CSV, the CLI can export the undocumented ones as a list:
+
+```shell
+cargo run --bin duckfn -- function_descriptions --all    # -> target/function_descriptions_all.csv
+```
+
+This loads no extension and queries no catalog: it reads what was recorded at compile time, so it needs
+no DuckDB around.
+
 From the attribute to the page:
 
 ```mermaid

@@ -336,9 +336,10 @@ just release_dev 0.1.1-dev.0
 
 ## 相关文档
 
-- [`DEVELOPMENT.zh.md`](DEVELOPMENT.zh.md)（[英文](DEVELOPMENT.md)）：目录结构、骨架取舍、构建与测试。
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
 - [`docs/AGENTS.md`](docs/AGENTS.md)：改文档站（尤其可运行 SQL 块）时的约定与已知坑。
+- 开发指南（`docs/docs/development/`，中英各一份）：目录结构、骨架取舍、写函数与测试、构建与发版 ——
+  面向改这个仓库的人，替代了模板早期的 `DEVELOPMENT.md`。
 - [`README.zh.md`](README.zh.md)（[英文](README.md)）：SQL 接口与使用说明。
 - [`scripts/release.sh`](scripts/release.sh) 与 [`scripts/rename.sh`](scripts/rename.sh)：
   `release_bump` / `release_dev` / `release_tag` 与改名的实际实现。

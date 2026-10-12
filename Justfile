@@ -1,4 +1,4 @@
-# 新扩展项目的 Justfile 模板 —— 与 AGENTS.md、DEVELOPMENT.md 是同一套流程的三种入口。
+# 新扩展项目的 Justfile 模板 —— 与 AGENTS.md、docs 里的开发指南是同一套流程的几种入口。
 #
 # 只改一处：把 extension_name 改成你的扩展名（或直接跑 `just rename <新名字>` 让别人替你改）。
 # 它必须与下面四处一致，否则 LOAD 会失败：

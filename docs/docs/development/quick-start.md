@@ -42,6 +42,22 @@ just rename csv_stats
 regenerates the `Cargo.lock` entry. It finishes by printing what still needs a human pass; the sample
 functions are the main item.
 
+### After renaming
+
+What is left once the name is consistent everywhere:
+
+1. **`AGENTS.md`** — fill in the `{{PROJECT_GOAL}}` placeholder, and change the `my_` prefix in the naming
+   convention to your own.
+2. **The sample functions** (`my_greet` / `my_greet_checked` / `my_sum`) and `test/sql/*.test` — replace
+   them with your API; see [writing functions](./writing-functions.md) and
+   [testing](./testing.md).
+3. **`community-extension/description.yml`** — `extension.name` / `description` / `maintainers` / `repo`
+   are yours to fill in; the field-by-field reasoning is in
+   [community extensions](./community-extension.md).
+4. **`LICENSE`** — the copyright holder, and the duckfn version in `Cargo.toml`.
+5. **Before the first release**, make sure the repository has a `main` branch and an `origin` remote:
+   `just release_tag` pushes both.
+
 ## 2. Build
 
 ```shell

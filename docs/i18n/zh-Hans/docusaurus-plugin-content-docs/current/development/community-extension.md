@@ -45,6 +45,14 @@ just docs_csv
 cp target/function_descriptions.csv community-extension/docs/function_descriptions.csv
 ```
 
+想知道哪些函数还没写进这份 CSV，CLI 可以把没写文案的那些导出来：
+
+```shell
+cargo run --bin duckfn -- function_descriptions --all    # -> target/function_descriptions_all.csv
+```
+
+它不加载扩展、不查目录，读的是编译期记录下来的内容，所以身边不需要有 DuckDB。
+
 从属性到页面：
 
 ```mermaid

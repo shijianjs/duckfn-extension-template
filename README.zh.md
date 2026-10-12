@@ -22,8 +22,9 @@ just rename my_new_extension
 
 `just rename`（即 `scripts/rename.sh`）会把扩展名必须一致的地方一次改齐 —— crate 名与
 `[[example]] name`、Makefile 的 `EXTENSION_NAME`、入口点符号、Justfile、CI 工作流，以及文档里的路径
-示例 —— 并按新包名重写 `Cargo.lock` 里那一条。脚本末尾会打印剩下需要人工过一遍的事情，清单在
-[DEVELOPMENT.zh.md](DEVELOPMENT.zh.md)（下一步）与 [AGENTS.md](AGENTS.md)（约定，含 `{{PROJECT_GOAL}}`
+示例 —— 并按新包名重写 `Cargo.lock` 里那一条。脚本末尾会打印剩下需要人工过一遍的事情，清单在开发
+指南的[快速开始](docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/development/quick-start.md)
+（下一步）与 [AGENTS.md](AGENTS.md)（约定，含 `{{PROJECT_GOAL}}`
 占位符）里。把两个示例函数换成你自己的 API 就是其中一条。
 
 ## 快速上手
@@ -90,7 +91,7 @@ just ci-build      # 只做官方构建，不跑测试
 
 `make test` 不会自动重新构建，改完 Rust 先跑 `just ci-build`（或 `make debug`）。
 更快的迭代方式（拿运行器直接跑 `build/debug/*.duckdb_extension`）与各测试文件覆盖什么，
-见 [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md)。
+见开发指南的[测试](docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/development/testing.md)。
 
 ## WebAssembly
 
@@ -138,7 +139,6 @@ LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-wi
 | 文件 | 里面有什么 |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | 约定、duckfn 知识地图、发版流程 |
-| [DEVELOPMENT.zh.md](DEVELOPMENT.zh.md) | 目录结构、骨架取舍、构建与测试、函数描述导出 |
+| [docs/i18n/zh-Hans/…/development/](docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/development/quick-start.md) | 开发指南：目录结构、骨架取舍、写函数与测试、构建与发版 |
 | [docs/README.md](docs/README.md) | 文档站：目录、命令、翻译流程、部署 |
-| [DEVELOPMENT.md](DEVELOPMENT.md) | 同上，英文 |
 | [README.md](README.md) | 本文件，英文 |

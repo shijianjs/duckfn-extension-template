@@ -41,6 +41,18 @@ just rename csv_stats
 CI 工作流 —— 以及文档里出现的每一处，并按新包名重写 `Cargo.lock`。它最后会打印还需要人工过一遍的清单，
 示例函数是其中主要的一项。
 
+### 改完之后
+
+扩展名处处一致之后，还剩这些要人工过一遍：
+
+1. **`AGENTS.md`** —— 填上 `{{PROJECT_GOAL}}` 占位符，并把命名约定里的 `my_` 前缀改成你自己的。
+2. **示例函数**（`my_greet` / `my_greet_checked` / `my_sum`）与 `test/sql/*.test` —— 换成你自己的 API，
+   见[写函数](./writing-functions.md)与[测试](./testing.md)。
+3. **`community-extension/description.yml`** —— `extension.name` / `description` / `maintainers` / `repo`
+   由你填，逐个字段的说明在[社区扩展](./community-extension.md)。
+4. **`LICENSE`** —— 版权人，以及 `Cargo.toml` 里的 duckfn 版本。
+5. **首次发版前**，确认仓库有 `main` 分支和 `origin` 远程：`just release_tag` 会同时推送这两者。
+
 ## 2. 构建
 
 ```shell
