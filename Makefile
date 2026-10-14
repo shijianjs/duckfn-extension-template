@@ -67,6 +67,38 @@ all: configure debug
 include extension-ci-tools/makefiles/c_api_extensions/base.Makefile
 include extension-ci-tools/makefiles/c_api_extensions/rust.Makefile
 
+# 覆盖 base.Makefile 的 wasm 链接：把 `-O3` 换成 `-O0`。
+#
+# 必须和 base 一样套 `ifneq ($(DUCKDB_WASM_PLATFORM),)` 守卫：base 只在 wasm 平台把 link_wasm_* 定义成
+# emcc 命令，原生平台走 else 分支得到**空的** link_wasm_*。若无条件重定义，会把原生那条空目标也改成
+# emcc，于是 linux / macOS / Windows 构建时报 `emcc: command not found`（Error 127）。
+#
+# 换 -O0 的原因：`-O3` 会把链接产物交给 wasm-opt 做后链接优化，而 CI 钉的 emsdk 里的 wasm-opt 与产物
+# 对不上，两个时期各挂过一次：
+#   - 1.5 那一支（ci-tools `v1.5-variegata`，emsdk 3.1.71 / binaryen v120）：Rust >= 1.89 产出的模块
+#     需要 `call-indirect-overlong`，v120 解析不了，`-O3` 那一步直接 `Unknown option` 失败；
+#   - 2.0 那一支（ci-tools / DuckDB 的 `v2.0-cyanoptera`）：emcc 递给 wasm-opt 的
+#     `--enable-bulk-memory-opt` 被拒绝（`Unknown option`），wasm_eh / wasm_mvp 都停在 `link_wasm_release`。
+# wasm-opt 只是优化器：`-O0` 跳过它，wasm-ld 的产物本身合法、DuckDB-Wasm 能加载运行，只是未经体积优化。
+# 也正因为只是跳过优化，这份覆盖对**低版本流水线同样成立**，不用按 DuckDB 版本分支。等上游把 emsdk
+# 对齐好（两条线的 wasm-opt 都能吃下产物）就可以整块删掉。
+#
+# Same `ifneq` guard as base.Makefile (base leaves link_wasm_* empty for native platforms, so an
+# unconditional redefinition would make native builds call `emcc` — Error 127). The `-O0` swap: `-O3` hands
+# the linked module to wasm-opt, and the wasm-opt CI pins has failed against it in two eras — on the 1.5 line
+# (ci-tools `v1.5-variegata`, emsdk 3.1.71 / binaryen v120) it cannot parse the `call-indirect-overlong`
+# feature that a Rust >= 1.89 module needs, and on the 2.0 line (ci-tools / DuckDB `v2.0-cyanoptera`) it
+# rejects the `--enable-bulk-memory-opt` flag emcc passes. wasm-opt is only an optimizer, so `-O0` skips it and
+# wasm-ld's output stays valid and loadable — which is exactly why this override is safe on the older
+# pipelines too, with no DuckDB-version branching. Delete the whole block once upstream's emsdk is aligned.
+ifneq ($(DUCKDB_WASM_PLATFORM),)
+link_wasm_debug:
+	emcc $(EXTENSION_BUILD_PATH)/debug/$(EXTENSION_LIB_FILENAME) -o $(EXTENSION_BUILD_PATH)/debug/$(EXTENSION_FILENAME_NO_METADATA) -O0 -g -sSIDE_MODULE=2 -sEXPORTED_FUNCTIONS="_$(EXTENSION_NAME)_init_c_api"
+
+link_wasm_release:
+	emcc $(EXTENSION_BUILD_PATH)/release/$(EXTENSION_LIB_FILENAME) -o $(EXTENSION_BUILD_PATH)/release/$(EXTENSION_FILENAME_NO_METADATA) -O0 -sSIDE_MODULE=2 -sEXPORTED_FUNCTIONS="_$(EXTENSION_NAME)_init_c_api"
+endif
+
 configure: venv platform extension_version
 
 debug: build_extension_library_debug build_extension_with_metadata_debug
