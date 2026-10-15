@@ -30,21 +30,19 @@ DuckDB 会下载一份签过名、且与你本机 DuckDB 版本和平台匹配�
 
 ## 从 GitHub Release 安装
 
-每个版本都会发成一个 GitHub Release，里面每个平台各一份 `.duckdb_extension`。直接按 URL 加载你平台的
-那一份：
-
-```sql
-LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension';
-```
-
-Release 里的文件没有用 DuckDB 的发行密钥签名，所以 DuckDB 必须加 `-unsigned` 启动：
+每个版本都会发成一个 GitHub Release，里面按平台各挂一份 `.duckdb_extension`，命名是
+`my_extension-<平台>.duckdb_extension`（`windows_amd64`、`linux_amd64`、`osx_arm64` 等），另有一份给浏览器用的
+WebAssembly 构建。下载你平台的那一份，**并改名成 `my_extension.duckdb_extension` 再加载** —— `LOAD` 收的是扩展名
+或本地路径（它不会去下载 URL，下载那条路是 `INSTALL '<url>'`），而入口点符号由文件名决定，直接用 Release 里的
+名字会报 `did not contain function "my_extension-windows_amd64_init_c_api"`：
 
 ```shell
-duckdb -unsigned
+curl -LO https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension
+mv my_extension-windows_amd64.duckdb_extension my_extension.duckdb_extension
+duckdb -unsigned -c "LOAD './my_extension.duckdb_extension';"
 ```
 
-在 Release 页面上挑对应平台的资产 —— 命名规则是 `my_extension-<平台>.duckdb_extension`
-（`windows_amd64`、`linux_amd64`、`osx_arm64` 等），另有一份给浏览器用的 WebAssembly 构建。
+Release 里的文件没有用 DuckDB 的发行密钥签名，所以要加 `-unsigned`。
 
 ## 从本地构建的产物安装
 

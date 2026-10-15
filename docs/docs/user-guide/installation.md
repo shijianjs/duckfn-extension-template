@@ -32,22 +32,20 @@ local build instead.
 
 ## From a GitHub release
 
-Every version is published as a GitHub Release carrying one `.duckdb_extension` per platform. Load the
-one matching your platform straight from its URL:
-
-```sql
-LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension';
-```
-
-A release file is not signed by DuckDB's distribution key, so DuckDB has to be started with `-unsigned`:
+Every version is published as a GitHub Release carrying one `.duckdb_extension` per platform, named
+`my_extension-<platform>.duckdb_extension` (`windows_amd64`, `linux_amd64`, `osx_arm64`, and so on), plus a
+WebAssembly build for the browser. Download the one matching your platform and **rename it to
+`my_extension.duckdb_extension`** before loading it — `LOAD` takes an extension name or a local path (it fetches
+no URLs; that is what `INSTALL '<url>'` is for), and DuckDB takes the entry-point symbol from the file name, so
+the release name fails with `did not contain function "my_extension-windows_amd64_init_c_api"`:
 
 ```shell
-duckdb -unsigned
+curl -LO https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension
+mv my_extension-windows_amd64.duckdb_extension my_extension.duckdb_extension
+duckdb -unsigned -c "LOAD './my_extension.duckdb_extension';"
 ```
 
-Pick the asset for your platform from the release page — names follow
-`my_extension-<platform>.duckdb_extension` (`windows_amd64`, `linux_amd64`, `osx_arm64`, and so on), plus a
-WebAssembly build for the browser.
+A release file is not signed by DuckDB's distribution key, hence `-unsigned`.
 
 ## From a local build
 

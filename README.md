@@ -126,12 +126,16 @@ are in [`docs/README.md`](docs/README.md).
 
 ## Installing the released extension
 
-Releases are GitHub Releases carrying the build matrices' `.duckdb_extension` files, one per platform:
+Releases are GitHub Releases carrying the build matrices' `.duckdb_extension` files, one per platform, named
+`my_extension-<platform>.duckdb_extension`. Download the one for your platform and **rename it to
+`my_extension.duckdb_extension`** before loading it — `LOAD` takes an extension name or a local path (it fetches
+no URLs; that is what `INSTALL '<url>'` is for), and DuckDB takes the entry-point symbol from the file name, so
+the release name fails with `did not contain function "my_extension-windows_amd64_init_c_api"`:
 
 ```shell
-duckdb -unsigned -c "
-LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension';
-"
+curl -LO https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension
+mv my_extension-windows_amd64.duckdb_extension my_extension.duckdb_extension
+duckdb -unsigned -c "LOAD './my_extension.duckdb_extension';"
 ```
 
 Publishing to DuckDB's [community extensions](https://duckdb.org/community_extensions/list_of_extensions)

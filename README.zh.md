@@ -122,12 +122,15 @@ just docs_build      # 真正该跑的那一条：onBrokenLinks 设为 throw，�
 
 ## 安装已发布的扩展
 
-发布物是 GitHub Release 上各平台构建出的 `.duckdb_extension` 文件：
+发布物是 GitHub Release 上各平台构建出的 `.duckdb_extension`，命名是 `my_extension-<平台>.duckdb_extension`。
+下载你平台那一份之后**先改名成 `my_extension.duckdb_extension` 再加载** —— `LOAD` 收的是扩展名或本地路径
+（它不会去下载 URL，下载那条路是 `INSTALL '<url>'`），而入口点符号由文件名决定，直接用 Release 里的名字会报
+`did not contain function "my_extension-windows_amd64_init_c_api"`：
 
 ```shell
-duckdb -unsigned -c "
-LOAD 'https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension';
-"
+curl -LO https://github.com/<owner>/<repo>/releases/latest/download/my_extension-windows_amd64.duckdb_extension
+mv my_extension-windows_amd64.duckdb_extension my_extension.duckdb_extension
+duckdb -unsigned -c "LOAD './my_extension.duckdb_extension';"
 ```
 
 注册进 DuckDB 的[社区扩展](https://duckdb.org/community_extensions/list_of_extensions)之后，就变成

@@ -334,6 +334,27 @@ just release_dev 0.1.1-dev.0
 这一步只动 `Cargo.toml` 与 `Cargo.lock`：文档与 README 里的示例始终指向最新**已发布**版本，
 不打 tag、不发布。
 
+### 给用户的「安装发布产物」写法（别写 `LOAD '<release url>'`）
+
+模板里这一条长期是错的，两个前提都不成立：
+
+- `LOAD` 收的是**扩展名**或**本地路径**，它**不会去下载 URL** —— 下载那条路是 `INSTALL '<url>'`
+  （`LOAD 'https://…'` 会把它当扩展名解析，报 `Extension "https:\\…" not found`）。
+- Release 里的资产叫 `<扩展名>-<平台>.duckdb_extension`，而 DuckDB 是**拿文件名去找入口点符号**的：照原名
+  加载会报 `did not contain function "<扩展名>-windows_amd64_init_c_api"`。
+
+所以给用户的写法是三步（`docs/docs/user-guide/installation.md` 的「从 GitHub Release 安装」、开发指南
+`build-and-release.md` 的「安装一份发布产物」、README 的「安装已发布的扩展」三处都按它写，中文侧同形）：
+
+```shell
+curl -LO https://github.com/<owner>/<repo>/releases/latest/download/<扩展名>-windows_amd64.duckdb_extension
+mv <扩展名>-windows_amd64.duckdb_extension <扩展名>.duckdb_extension
+duckdb -unsigned -c "LOAD './<扩展名>.duckdb_extension';"
+```
+
+注册进社区仓之后另有更省事的一条：`INSTALL <扩展名> FROM community;` 再 `LOAD <扩展名>;` —— 那份是签过名
+的，文件名本来就对。
+
 ## 相关文档
 
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
