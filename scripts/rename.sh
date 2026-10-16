@@ -111,7 +111,9 @@ echo "  2. docs/docusaurus.config.ts 的 REPO_URL —— 改成你的仓库地�
 echo "     它同时是首页徽章与可运行 SQL 预加载的来源，不换会去模板仓库找 Release）"
 echo "  3. community-extension/description.yml —— extension.name / description / maintainers / repo"
 echo "  4. AGENTS.md 的 {{PROJECT_GOAL}} 占位符"
-echo "  5. README 与 docs 文档里的说明文字（模板的来历、示例用法）"
+echo "  5. README 与 docs 文档里的说明文字（模板的来历、示例用法），以及 README / README.zh.md 徽章里"
+echo "     写死的仓库地址 —— release / license 两枚是字面量，本脚本改不到；周下载那枚只含扩展名，"
+echo "     已经跟着改了"
 echo "  6. LICENSE 的版权人、Cargo.toml 的 duckfn 版本"
 echo
 git --no-pager diff --stat
