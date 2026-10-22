@@ -6,7 +6,9 @@ description: The three ways to install my_extension — DuckDB's community repos
 
 # Installation
 
-`my_extension` needs **DuckDB 1.3 or newer**. It is an ordinary loadable extension, so `INSTALL` and
+`my_extension` needs **DuckDB 1.4 or newer**. The release binaries are built against DuckDB 2.0.0 and
+also load into 1.4.x and 1.5.x (the C API is binary compatible across these versions), so there is
+no separate 1.5 build: on an older DuckDB, install the same 2.0 release asset. It is an ordinary loadable extension, so `INSTALL` and
 `LOAD` are all it takes; there is no separate download, library or setup step.
 
 ## From the community repository

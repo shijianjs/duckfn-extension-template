@@ -6,7 +6,8 @@ description: 装 my_extension 的三条路 —— DuckDB 社区仓、GitHub Rele
 
 # 安装
 
-`my_extension` 需要 **DuckDB 1.3 或更新**。它是一个普通的可加载扩展，`INSTALL` 与 `LOAD` 就是全部；
+`my_extension` 需要 **DuckDB 1.4 或更新**。发布产物基于 DuckDB 2.0.0 构建，同样能加载进 1.4.x / 1.5.x
+（C API 二进制兼容），所以没有单独的 1.5 构建：旧版本用户直接安装同一份 2.0 release 资产即可。它是一个普通的可加载扩展，`INSTALL` 与 `LOAD` 就是全部；
 没有额外的下载、库文件或配置步骤。
 
 ## 从社区仓安装
