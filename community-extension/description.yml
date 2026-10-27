@@ -22,6 +22,10 @@ docs:
     SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE), (3.0::DOUBLE)) t(x);
     -- 7.0
   extended_description: |
+    Documentation: <https://<owner>.github.io/<repo>/docs/intro> - installation, the function reference
+    and examples. **Keep this line first**: the community-extension page renders the body before
+    anything else, so the docs link is what a reader sees without scrolling.
+
     A two-line summary of the whole extension: what goes in, what comes out, and the one thing a user
     has to know before the first call.
 

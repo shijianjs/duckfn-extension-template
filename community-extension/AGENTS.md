@@ -48,6 +48,17 @@ tag 名**。三者都是合法 git ref、社区仓都能照着 clone，但上游
 - `docs.hello_world`：社区文档页会把它渲染进代码块，所以必须是**可直接复制跑**的真实例子 ——
   现在这两段就是 README 快速上手的两个示例。页面上「Installing and Loading」那段由社区仓的
   `layout/default.md` 自动加，`hello_world` 里不要再写 `INSTALL` / `LOAD`。
+- `docs.extended_description`：**第一段就放文档链接**，再开始讲功能 ——
+
+  ```text
+  Documentation: [user guide](https://<owner>.github.io/<repo>/docs/intro) ·
+  [function reference](https://<owner>.github.io/<repo>/docs/category/functions) - installation,
+  every function with a runnable example, and the NULL / error rules.
+  ```
+
+  社区扩展页把这段正文渲染在页面最上方，读者不该滚到最后才找到站点；末尾只留仓库链接
+  （`Development notes: <repo>`），同一批文档链接不要在开头与结尾各抄一遍。链接指向已部署的
+  GitHub Pages 站（`https://<owner>.github.io/<repo>/docs/intro`），发版前点一遍确认没有 404。
 
 ## 那份 CSV 是必须的，而且会过期
 
