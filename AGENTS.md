@@ -411,7 +411,7 @@ duckdb -unsigned -c "LOAD './<扩展名>.duckdb_extension';"
 - [`src/AGENTS.md`](src/AGENTS.md)：`src/` 的代码约定（同构目录、形状选择、`auto_collect`、NULL 契约）。
 - [`test/AGENTS.md`](test/AGENTS.md)：`test/sql/` 的测试约定（期望值来源、覆盖矩阵、写法与计数）。
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
-- [`docs/AGENTS.md`](docs/AGENTS.md)：改文档站（尤其可运行 SQL 块）时的约定与已知坑。
+- [`docs/AGENTS.md`](docs/AGENTS.md)：改文档站（可运行 SQL 块、展示图像）时的约定与已知坑。
 - 开发指南（`docs/docs/development/`，中英各一份）：目录结构、骨架取舍、写函数与测试、构建与发版 ——
   面向改这个仓库的人，替代了模板早期的 `DEVELOPMENT.md`。
 - [`README.zh.md`](README.zh.md)（[英文](README.md)）：SQL 接口与使用说明。

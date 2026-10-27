@@ -7,7 +7,9 @@
 参考实现：[duckfn_statrs](https://github.com/shijianjs/duckfn-statrs) —— 把 statrs 的
 34 个聚合 + 509 个标量（543 个注册名，含 `Modulus` 的 5 个整数/浮点 overload）全量搬上 SQL。
 本文件是那次工作的反推流程，坑也是它踩出来的。副作用与 `volatile` 那一节来自
-[duckfn_open](https://github.com/shijianjs/duckfn-open)（打印、写文件、起进程这类会碰外面世界的函数）。
+[duckfn_open](https://github.com/shijianjs/duckfn-open)（打印、写文件、起进程这类会碰外面世界的函数），
+文档里展示图像那一节来自 [duckfn_kuva](https://github.com/shijianjs/duckfn-kuva)（返回值本身就是 SVG
+的画图类扩展）。
 
 工作量大致是 **代码 2 : 测试 3 : 文档 2 : 发布 1**。测试比代码多不是笔误：一个几百函数的扩展，
 函数体几乎都是「一行转发」，真正的风险全在语义（NULL、边界、并行）与文档缺口上。
@@ -205,6 +207,10 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
 - **中英成对改**：同一页在 `docs/docs/` 与 `docs/i18n/zh-Hans/.../current/` 各一份，相对路径、
   `id` / `slug` / `sidebar_position` 保持一致，页内链接用相对文件路径。细节见
   [`../docs/AGENTS.md`](../docs/AGENTS.md)。
+- **图优先让扩展自己画**：返回值是 SVG / HTML 的扩展，文档里用可运行块的 `"show":"svg"` 渲染，不要贴
+  截图 —— 截图会过期、锁死一个主题的配色、和块里的数据对不上。静态图（logo、社交卡片）放
+  `docs/static/img/`，引用走 `useBaseUrl`；不要钉画布尺寸与预览框高度，交互内容必须走 `iframe` 并手调
+  高度。完整的取舍见 [`../docs/AGENTS.md`](../docs/AGENTS.md) 的「展示图像」。
 
 ## 7. 发布与社区扩展
 
@@ -232,6 +238,7 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
 - [ ] `just lint`（clippy `-D warnings`）干净
 - [ ] `just test` 全绿，`just build_wasm` 能过（若保留 wasm 路线）
 - [ ] 每个函数都有英文 `description`（`cargo run --bin duckfn -- function_descriptions --all` 无缺口）
+- [ ] 文档里的图是块渲染出来的（不是截图），静态图走 `static/img/` + `useBaseUrl`，没有钉死画布或预览框尺寸
 - [ ] README 中英同步、docs 站中英同步、安装写法是三步而不是 `LOAD '<url>'`
 - [ ] `community-extension/description.yml` 的 `repo.ref` 指向已发布的 tag
 

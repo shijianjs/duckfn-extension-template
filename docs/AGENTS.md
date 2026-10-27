@@ -68,6 +68,46 @@ CLI 的 `--base-url` / `--asset`）。
   DuckDB…」**；这不是代码问题。离线验证走 `npm test`：kit 的 harness 用本地引擎与 loopback
   服务器，所有块都在那里跑。
 
+## 展示图像
+
+文档里出现图，只有两条路，别混用：
+
+| 图的来源 | 怎么放 | 例子 |
+| --- | --- | --- |
+| **扩展自己算出来的**（返回值是 SVG / HTML） | 可运行 SQL 块 + `show` | `{"type":"duckfn","show":"svg"}` |
+| **站点自己的静态图**（logo、社交卡片、示意图） | `static/img/` + `useBaseUrl('img/…')` | `useBaseUrl('img/logo.svg')` |
+
+### 块里渲染
+
+`show` 可选 `table`（默认）、`text`、`html`、`iframe`、`svg`：
+
+- **返回值是一份 SVG 文档**（画图类扩展）→ `"show":"svg"`。图画在结果区，可全屏缩放/平移，末尾的
+  `Table` 标签留着原始标记。
+- **交互式内容**（注入 `<script>`、有自己的坐标系与快捷键）→ `"show":"iframe"`。放进宿主文档会跟页面
+  抢快捷键、按图定位的控件会改成按页面定位；iframe 是沙箱（`allow-scripts`、无 `allow-same-origin`），
+  才有自己的坐标系。
+- 普通结果表用默认的 `table` 就够，写 `"show":"table"` 只是显式一点。
+
+三条不要：
+
+- **不要钉画布尺寸**（规格里的 `width` / `height`）。扩展默认的画布比例是调过的，压成又宽又扁会明显
+  变形。
+- **不要给 `"show":"svg"` 的块加 `option.height`**：它按 SVG 自身高度自动撑开，写死的数字只会在宽高比
+  不同的图上留白、或在窄屏下把图裁掉。唯一需要手调高度的是 `iframe` —— iframe 没有内在高度。
+- **不要给「块本身就能画出来的图」再配一张 `<img>` 截图**：截图会过期、会锁死一个主题的配色，而且和
+  块里的数据对不上。
+
+### 静态图
+
+- 放 `static/img/`，引用走 `useBaseUrl('img/…')`，**不要写死 `/<repo>/img/…`**：站点发布在 `/<repo>/`
+  子路径下，写死的前缀在本地与线上不一致。
+- `static/` 会被复制进**每个 locale** 的输出，所以跨语言共用的图放这里一份即可，路径里不要带语言前缀；
+  只给某一页用的图也可以跟 `.md` 放一起用相对路径引用，但那样中英两份要各放一份。
+- 体积：logo 用 SVG（十几 KB），社交卡片 JPG 几十 KB 量级。不要提交构建产物、整页截图或几百 KB 的
+  PNG —— 它们会被打进站点，也会留在 git 历史里。
+- `favicon` 与链接预览图（`image`）在 `docusaurus.config.ts` 里；换 logo 时 logo、favicon、社交卡片与
+  `src/css/custom.css` 的品牌色一起换（那份注释里写明了「palette 来自 logo.svg，两处一起改」）。
+
 ## 中英双语要成对改
 
 站点有两个 locale（英文 + `i18n/zh-Hans/…`）。同一页在 `docs/` 与
