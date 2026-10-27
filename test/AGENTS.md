@@ -57,6 +57,50 @@ test/sql/<上游模块>/<子模块>.test   模块大了再分子目录
 非确定性函数（采样）不能断言具体值，断言形状与范围：`list_count`、`list_min >= 0`、元素个数等于
 `k`、两次调用不保证相等。
 
+## 副作用函数怎么测
+
+打印、写文件、起进程这类函数，**副作用本身不进结果集**，所以不能断言「打了什么」，要断言**可数的
+证据**。四种，缺一不可：
+
+1. **目录断言**：注册成 `volatile` 之后，`duckdb_functions()` 里的 `has_side_effects` 就是 true。
+   把该为 true 的名字集合整体断言一次，防止后来新增函数忘了标：
+
+   ```sql
+   query T
+   SELECT string_agg(DISTINCT function_name, ',' ORDER BY function_name)
+   FROM duckdb_functions()
+   WHERE function_name LIKE 'my_%' AND has_side_effects;
+   ----
+   my_print,my_write_file
+   ```
+
+2. **求值次数**：一次调用只产生一个副作用。用文件数当计数器 —— 没有 `volatile` 时，
+   `SELECT length(my_write_file(...))` 会写两个文件。
+
+   ```sql
+   query T
+   SELECT length(my_write_file('body', 'txt', {'dir':'__TEST_DIR__/once'})) > 0;
+   ----
+   true
+   query I
+   SELECT count(*) FROM glob('__TEST_DIR__/once/*');
+   ----
+   1
+   ```
+
+3. **`EXPLAIN` 不产生副作用**：`statement ok` 跑一条 `EXPLAIN`，然后确认目录里是 0 个文件。这是
+   「常量折叠发生在优化期」那条最直接的回归断言。
+
+4. **常量参数逐行执行**：`FROM (VALUES (1),(2),(3))` 三行就是三个文件。这条同时锁住了「一次调用 =
+   一行」的语义，防止有人为了「常量只跑一次」把 `volatile` 去掉。
+
+补充约定：
+
+- **写出去的东西要读回来验**：`read_text` / `read_blob` 比对内容，别只断言文件存在。
+- **测试目录用 `__TEST_DIR__`**，不要写死路径；`just test` 收尾会清掉被忽略的临时文件。
+- **不要断言 stdout 的内容或顺序**：stdout 是进程级的，sqllogictest 不比较它，并行下顺序也不保证。
+  要证明「确实执行了」，用文件数或返回值。
+
 ## 写法约定
 
 - 每份文件从**干净数据库**开始，所以第一份可以断言「加载前函数不存在」，其余文件开头 `require

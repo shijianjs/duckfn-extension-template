@@ -195,7 +195,8 @@ SQL 的 [duckfn_statrs](https://github.com/shijianjs/duckfn-statrs) 就是这种
 
 - 上游「算不出」的哨兵值（NAN、空 `Option`、`Err`）必须有统一出口，不能漏到结果列；
 - 多列输入默认做成聚合，而不是 `Vec` 参数 + 标量；
-- 非确定性函数（采样、随机数、时间戳）要 `volatile = true`，否则 DuckDB 会缓存或折叠相同参数的调用。
+- 有副作用（打印、写文件、起进程）或非确定性的标量函数必须 `volatile = true`：否则常量折叠会在优化期
+  先执行一次、折进外层表达式再执行一次，`EXPLAIN` 也会真的产生副作用。
 
 ### 文档站（docs/）
 
@@ -405,7 +406,8 @@ duckdb -unsigned -c "LOAD './<扩展名>.duckdb_extension';"
 ## 相关文档
 
 - [`AGENTS/wrapping-a-rust-library.md`](AGENTS/wrapping-a-rust-library.md)：把上游 Rust 库整体映射成
-  扩展的完整流程（立项、上游盘点、形状映射、三态契约、测试策略、文档、验收清单、踩过的坑）。
+  扩展的完整流程（立项、上游盘点、形状映射、三态契约、副作用与 `volatile`、测试策略、文档、验收清单、
+  踩过的坑）。
 - [`src/AGENTS.md`](src/AGENTS.md)：`src/` 的代码约定（同构目录、形状选择、`auto_collect`、NULL 契约）。
 - [`test/AGENTS.md`](test/AGENTS.md)：`test/sql/` 的测试约定（期望值来源、覆盖矩阵、写法与计数）。
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。

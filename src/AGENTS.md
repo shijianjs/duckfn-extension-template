@@ -82,10 +82,34 @@ fn my_stat(values: Vec<f64>) -> DuckOptionResult<f64> {
   用户报错时能自解释。参数校验的 helper（概率范围、正数、区间顺序）放子模块 `mod.rs`，别复制。
 - 不要用 `panic!` 做参数校验：panic 会被 duckfn 捕获成 DuckDB 错误，但消息没有上下文。
 
-## 非确定性函数标 `volatile = true`
+## 副作用与非确定性：一律 `volatile = true`
 
-采样、随机数、时间戳这类函数，DuckDB 默认会缓存相同参数的调用结果，甚至把常量参数的调用折叠成
-只执行一次。判断标准：**同样输入调用两次，结果可能不同吗**。是 → `volatile = true`；否 → 不加。
+会碰外面世界的标量函数（打印到 stdout、写文件、起进程、发请求）和结果不稳定的函数（采样、随机数、
+当前时间戳）都必须标 `volatile = true`：
+
+```rust
+#[duck_scalar_function(volatile = true)]
+fn my_write_file(content: String, ext: String) -> DuckOptionResult<String> { … }
+```
+
+不标的后果（[duckfn_open](https://github.com/shijianjs/duckfn-open) 实测）：
+
+- 常量参数的调用在**优化期**先求值一次、折成常量；折出来的值被外层表达式吃掉时，执行期会**再求值
+  一次** —— `SELECT length(my_write_file('a','txt'))` 落**两个**文件、`SELECT length(my_print(...))`
+  打**两遍**；
+- `EXPLAIN SELECT my_write_file('a','txt')` 会**真的写一个文件**：只做规划、不打算执行的查询不该有
+  副作用。
+
+标上之后语义是「一次调用 = 一行，不多不少」，常量参数也逐行（`SELECT my_print('x') FROM t` 有几行
+打几行）。因此：
+
+- **文档 / README / `description.yml` 里不要承诺「常量只跑一次」**；
+- **纯函数不要加**，白丢优化器的复用与折叠。判断标准：同样输入调用两次结果可能不同吗？会碰外面世界吗？
+- 返回值带上入参（文本进文本出、内容进路径出），副作用之外还有值可用，用户能 `length(...)` 折叠掉；
+- 写 stdout 记得 flush：Rust 的 stdout 按行缓冲，不带换行的输出会卡在缓冲区里，看起来像没打；
+- 不要承诺逐行副作用的顺序：并行扫描下它与表顺序无关。
+
+测试怎么断言这类函数见 [`../test/AGENTS.md`](../test/AGENTS.md) 的「副作用函数怎么测」。
 
 ## 类型映射
 

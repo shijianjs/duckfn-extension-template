@@ -6,7 +6,8 @@
 
 参考实现：[duckfn_statrs](https://github.com/shijianjs/duckfn-statrs) —— 把 statrs 的
 34 个聚合 + 509 个标量（543 个注册名，含 `Modulus` 的 5 个整数/浮点 overload）全量搬上 SQL。
-本文件是那次工作的反推流程，坑也是它踩出来的。
+本文件是那次工作的反推流程，坑也是它踩出来的。副作用与 `volatile` 那一节来自
+[duckfn_open](https://github.com/shijianjs/duckfn-open)（打印、写文件、起进程这类会碰外面世界的函数）。
 
 工作量大致是 **代码 2 : 测试 3 : 文档 2 : 发布 1**。测试比代码多不是笔误：一个几百函数的扩展，
 函数体几乎都是「一行转发」，真正的风险全在语义（NULL、边界、并行）与文档缺口上。
@@ -114,13 +115,38 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
 铁律：哨兵值永远不能作为值出现在结果列里。空组算出 NAN 却把 NAN 返回给用户，是这个项目最容易犯
 也最难被发现的错 —— 用户只会看到 `nan`，然后以为数据有问题。
 
-### 非确定性函数要标 `volatile = true`
+### 有副作用 / 非确定性的标量函数：一律 `volatile = true`
 
-采样、时间戳、随机数这类函数，DuckDB 默认会缓存、复用相同参数的调用结果，甚至把常量参数的调用
-折叠成只执行一次。`#[duck_scalar_function(volatile = true)]` 才会让每次调用真的执行。
+两类函数必须标 `#[duck_scalar_function(volatile = true)]`：
 
-判断标准：**同样的输入调用两次，结果是否可能不同**。是 → `volatile`；否（例如退化成常量的
-`Dirac` 采样）→ 不加。加多了会让优化器无法复用，加少了用户会看到「采样 100 次全是同一个数」。
+- **结果不稳定**：采样、随机数、当前时间戳；
+- **会碰外面世界**：打印到 stdout、写文件、起进程、发请求。
+
+不标会发生什么（[duckfn_open](https://github.com/shijianjs/duckfn-open) 实测）：
+
+- **常量折叠发生在优化期**。参数全是常量时，DuckDB 会在执行之前先求值一次、把调用折成常量；折出来的
+  值如果又被外层表达式吃掉，执行期会**再求值一次**。于是 `SELECT length(op_write_file('a','txt'))`
+  落**两个**文件，`SELECT length(op_print(...))` 打**两遍**。
+- **`EXPLAIN` 会真的执行一次**。`EXPLAIN SELECT op_write_file('a','txt')` 会写出一个文件 —— 只做规划、
+  不打算执行的查询不该有副作用。
+
+标上之后语义变成「一次调用 = 一行，不多不少」，常量参数也一样：`SELECT op_print('x') FROM t` 有几行
+就打几行，`SELECT op_open_path('report.html') FROM reports` 一行开一个窗口。这才是逐行标量函数该有的
+样子，但要接受两点：
+
+- **不要在任何文档里承诺「常量参数只跑一次」**。README、用户指南、`description.yml` 都按「逐行」写。
+- **纯函数不要加**。加了就放弃了优化器的复用与折叠，没有收益。判断标准：同样输入调用两次，结果可能
+  不同吗？会碰外面世界吗？任一为「是」→ 加。
+
+配套的设计与实现约定：
+
+- **返回值带上入参**：`op_print(text)` 返回那段文本、`op_write_file(content, ext)` 返回路径。副作用之外
+  还有个值可用，用户可以把它留在投影里，也可以 `length(...)` 折叠掉只保留副作用。
+- **写 stdout 要 flush**：Rust 的 stdout 按行缓冲，不带换行的输出会卡在缓冲区里，看起来像没打。
+- **别承诺输出顺序**：逐行副作用的先后属于执行细节，并行扫描下不保证与表顺序一致。需要顺序的场景
+  应该在文档里说清「不要依赖顺序」，而不是假装它稳定。
+
+怎么测这类函数（可数的证据，而不是「看起来打了」）见 [`../test/AGENTS.md`](../test/AGENTS.md)。
 
 ## 3. 目录与代码组织
 
@@ -197,7 +223,8 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
 - [ ] 上游每个 `pub fn` / `pub const` 都有 SQL 出口，或出现在不包装清单里
 - [ ] `duckdb_functions()` 的计数与清单一致（注意 overload 会让计数大于函数名数）
 - [ ] 三态契约写在一处，所有函数都走同一个 helper；结果列里不会出现 `nan`
-- [ ] 非确定性函数都标了 `volatile = true`
+- [ ] 有副作用 / 非确定性的函数都标了 `volatile = true`，测试里有 `has_side_effects` 名单、
+      求值次数与「`EXPLAIN` 不产生副作用」三条断言
 - [ ] 每个函数至少覆盖：正常值、NULL、边界、错误路径（能报错的才有）
 - [ ] 聚合额外覆盖：空组、单值、`GROUP BY`、跨 DataChunk、`PRAGMA threads=4`
 - [ ] 期望值全部来自上游 `assert` 或实跑输出，没有手算
@@ -208,7 +235,7 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
 - [ ] README 中英同步、docs 站中英同步、安装写法是三步而不是 `LOAD '<url>'`
 - [ ] `community-extension/description.yml` 的 `repo.ref` 指向已发布的 tag
 
-## 9. 踩过的坑（duckfn_statrs 实录）
+## 9. 踩过的坑（duckfn_statrs / duckfn_open 实录）
 
 1. **`list()` 保留 NULL，聚合跳过 NULL。** 把多列输入做成「`Vec` 参数 + 标量」时，用户得先
    `list(x)`，而 `list()` 会把 NULL 也收进去 —— 与聚合的语义不一致，同一个函数两种行为。
@@ -226,5 +253,10 @@ grep -rn "#\[cfg(test)\]" -A80 <crate>/src --include=*.rs
    函数注册成五个。
 9. **`docs_build` 依赖 wasm 产物。** 文档站预加载的是 `static/duckdb-extensions/` 下的本机构建，
    没先 `just build_wasm_eh` 会构建失败。
-10. **注释与代码一起过期。** 目录结构、测试文件清单这类「第二份真相」最容易腐烂 —— 能在代码里读到的
+10. **副作用函数没标 `volatile`：`EXPLAIN` 也会落文件。** 常量折叠发生在优化期，折进 `length(...)`
+    之后执行期还会再求值一次 —— 一个调用落两个文件、输出打两遍；`EXPLAIN SELECT op_write_file(...)`
+    会真的写一个文件。标上 `volatile = true` 后语义变成「一次调用 = 一行」，代价是常量参数也逐行执行。
+11. **stdout 不 flush 就看不到。** Rust 的 stdout 按行缓冲，`op_print(text, '')` 这种不带换行的调用
+    不显式 flush，内容会卡在缓冲区里，看起来像没打或打了一半。
+12. **注释与代码一起过期。** 目录结构、测试文件清单这类「第二份真相」最容易腐烂 —— 能在代码里读到的
     就不要抄进文档，抄了就写清「以代码为准」。
