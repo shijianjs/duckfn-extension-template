@@ -1,6 +1,7 @@
 <!--
 AGENTS.md（duckfn-extension-template 自带的那一份）：克隆模板后**只改下面「项目事实」里的
 {{PROJECT_GOAL}}**，其余部分（约定与流程）不用动，它们对任何 duckfn 扩展都成立。
+`AGENTS/` 下的 playbook 与 `src/`、`test/` 的文件夹级 AGENTS.md 同理，是本文件按主题拆出去的正文。
 -->
 
 # AGENTS.md
@@ -174,6 +175,27 @@ duckfn 的属性宏默认拿 **Rust 函数名**当注册名，所以直接把函
 不要再抄一份字面量。代价是这类函数得写成 `pub(super)`，因为生成的模块沿用函数的可见性。
 `overloads_name` 能把「同一名字下按参数个数/类型分派」的多个签名并成一个函数集，需要时再用
 （见 duckfn 的文档）。
+
+### 把一个 Rust 库映射成扩展
+
+模板的 `my_greet` / `my_sum` 只演示「怎么写一个函数」。当上游 crate 本身就是全部价值（把 statrs 搬上
+SQL 的 [duckfn_statrs](https://github.com/shijianjs/duckfn-statrs) 就是这种，34 个聚合 + 509 个标量），
+要做的事远不止写函数：范围盘点、形状映射、NULL 契约、测试期望值的来源、文档与社区扩展页，都要在
+动手前定下来。
+
+**完整流程、决策表、验收清单与踩过的坑见 [`AGENTS/wrapping-a-rust-library.md`](AGENTS/wrapping-a-rust-library.md)**。
+落到具体目录时再读那两份文件夹级约定：
+
+| 目录 | 约定 |
+| --- | --- |
+| [`src/`](src/AGENTS.md) | 目录与上游模块树同构、形状选择、`auto_collect`、三态契约、注释与文档元数据 |
+| [`test/`](test/AGENTS.md) | 期望值只信上游 `assert`、每函数必覆盖的边界、冒烟计数 |
+
+三条最容易漏的（理由在那份 playbook 里）：
+
+- 上游「算不出」的哨兵值（NAN、空 `Option`、`Err`）必须有统一出口，不能漏到结果列；
+- 多列输入默认做成聚合，而不是 `Vec` 参数 + 标量；
+- 非确定性函数（采样、随机数、时间戳）要 `volatile = true`，否则 DuckDB 会缓存或折叠相同参数的调用。
 
 ### 文档站（docs/）
 
@@ -382,6 +404,10 @@ duckdb -unsigned -c "LOAD './<扩展名>.duckdb_extension';"
 
 ## 相关文档
 
+- [`AGENTS/wrapping-a-rust-library.md`](AGENTS/wrapping-a-rust-library.md)：把上游 Rust 库整体映射成
+  扩展的完整流程（立项、上游盘点、形状映射、三态契约、测试策略、文档、验收清单、踩过的坑）。
+- [`src/AGENTS.md`](src/AGENTS.md)：`src/` 的代码约定（同构目录、形状选择、`auto_collect`、NULL 契约）。
+- [`test/AGENTS.md`](test/AGENTS.md)：`test/sql/` 的测试约定（期望值来源、覆盖矩阵、写法与计数）。
 - [`docs/README.md`](docs/README.md)：文档站的布局、命令、翻译流程与部署。
 - [`docs/AGENTS.md`](docs/AGENTS.md)：改文档站（尤其可运行 SQL 块）时的约定与已知坑。
 - 开发指南（`docs/docs/development/`，中英各一份）：目录结构、骨架取舍、写函数与测试、构建与发版 ——
