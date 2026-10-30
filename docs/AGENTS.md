@@ -114,3 +114,10 @@ CLI 的 `--base-url` / `--asset`）。
 `docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/` 下各有一份，**改了一边就
 按同样的相对路径改另一边**：`id` / `slug` / `sidebar_position` 保持一致，页内链接用相对
 文件路径，可运行块里的 SQL 是代码、照抄，只翻注释。
+
+分类目录的元数据是例外：**不要**在 `i18n/` 下放 `_category_.json` —— Docusaurus 只从默认
+（英文）内容路径读取它，那份副本永远不会被读。分类名、generated-index 目录页的标题与描述
+要写进 `i18n/zh-Hans/docusaurus-plugin-content-docs/current.json` 的
+`sidebar.<sidebar 名>.category.<英文 label>` 键，目录页那两段在 `.link.generated-index.title`
+与 `.link.generated-index.description` 下。目录页标题留空会回退成分类名，不需要另起名字时
+省略即可；只翻正文而漏了这些键，中文站的侧边栏与目录页仍然是英文。
