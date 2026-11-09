@@ -14,12 +14,16 @@ import type {UrlPreloadEntry} from 'duckfn-docs-kit/sql/runtimeConfig';
 // ============================================================================
 // 克隆模板后要改的就是这一段
 //
-// 仓库地址出现在导航栏的 Links 下拉、页脚与首页按钮上，所以只写一份、由下面各处引用，
-// 而不是逐个页面硬编码。`my_extension` 那几处由 `just rename <新名字>` 自动改写。
+// 仓库地址出现在导航栏的 Links 下拉、页脚、可运行 SQL 的预加载，以及两个首页的徽章上。
+// 前三处都从这里取；首页是 MDX（`src/pages/index.mdx` 与 `i18n/zh-Hans/.../index.mdx`），
+// 读不到 `customFields`，徽章的 `href` 里另外写了一份，克隆后要一起改。
+// `my_extension` 那几处由 `just rename <新名字>` 自动改写。
 //
 // What to edit after cloning the template. The repository URL shows up in the navbar dropdown, the
-// footer and the home page button, so it is written once and referenced everywhere else. The
-// `my_extension` occurrences are rewritten by `just rename <new-name>`.
+// footer, the runnable-SQL preload and the badges on two home pages. The first three read it from
+// here; the home pages are MDX and cannot see `customFields`, so their badge `href`s carry a second
+// copy that has to change with it. The `my_extension` occurrences are rewritten by
+// `just rename <new-name>`.
 // ============================================================================
 // 模板自己的仓库地址：首页徽章、导航栏、页脚与可运行 SQL 的扩展预加载都从这里取。克隆后**要改成你的
 // 仓库**（`just rename` 只改扩展名，不动这个 URL），否则预加载会去模板仓库找 Release。
