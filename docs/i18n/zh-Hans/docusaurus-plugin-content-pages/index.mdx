@@ -1,0 +1,128 @@
+---
+title: my_extension
+description: 如何安装并使用这个 DuckDB 扩展、它提供的函数，以及开发指南的位置。
+hide_table_of_contents: true
+wrapperClassName: dfk-home
+---
+
+import Link from '@docusaurus/Link';
+import {registerDfkElements} from 'duckfn-docs-kit';
+
+import styles from '@site/src/pages/index.module.css';
+
+{registerDfkElements()}
+
+{/* `MDXPage` 自带 `<Layout>` 与页面栅格；`dfk-home` 给 `src/css/home.css`
+    一个作用域，把首页放成全宽。
+
+    徽章的 `href` 内联了仓库地址，因为 MDX 页面读不到 `customFields`；克隆模板后
+    与 `docusaurus.config.ts` 的 `REPO_URL` 一起改。 */}
+
+<dfk-hero
+  logo-src="/img/logo.svg"
+  title="my_extension"
+  tagline="给 DuckDB 补充 SQL 函数">
+
+<dfk-action kind="primary" href="/docs/user-guide/installation">开始使用</dfk-action>
+
+<dfk-action kind="secondary" href="https://github.com/shijianjs/duckfn-extension-template" icon="simple-icons:github">GitHub</dfk-action>
+
+<dfk-badge href="https://duckdb.org" src="https://img.shields.io/badge/DuckDB-1.4%2B-fff100?logo=duckdb&style=flat" alt="DuckDB 1.4 or newer" />
+
+<dfk-badge href="https://duckdb.org/community_extensions/extensions/my_extension" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcommunity-extensions.duckdb.org%2Fdownloads-last-week.json&query=%24.my_extension&label=%E5%91%A8%E4%B8%8B%E8%BD%BD&color=blue&logo=duckdb&logoColor=a899ff&style=flat" alt="DuckDB 社区仓的周下载量" />
+
+<dfk-badge href="https://github.com/shijianjs/duckfn-extension-template/releases" src="https://img.shields.io/github/v/release/shijianjs/duckfn-extension-template?style=flat&logo=github&label=%E7%89%88%E6%9C%AC" alt="Latest release" />
+
+<dfk-badge href="https://github.com/shijianjs/duckfn-extension-template/blob/main/LICENSE" src="https://img.shields.io/badge/%E8%AE%B8%E5%8F%AF%E8%AF%81-MIT-14459b.svg?style=flat&logo=github" alt="MIT license" />
+
+</dfk-hero>
+
+<dfk-features section-title="my_extension 能给你什么">
+
+<dfk-feature icon="lucide:braces" title="直接用 SQL 调用">
+my_greet、my_greet_checked 与 my_sum 就是普通的 DuckDB 函数：放进任意查询，和内置函数一起用，调用处不需要 import 任何东西。
+</dfk-feature>
+
+<dfk-feature icon="lucide:package" title="一行装好">
+INSTALL my_extension FROM community; 再 LOAD my_extension; —— 构建签过名、且与你的 DuckDB 版本和平台匹配，所以不用加 -unsigned。
+</dfk-feature>
+
+<dfk-feature icon="lucide:monitor-down" title="每个版本都有各平台产物">
+每个版本都会把各平台各一份 .duckdb_extension 挂到 GitHub Release 上，LOAD 可以直接按 URL 取，中间不用先下载。
+</dfk-feature>
+
+<dfk-feature icon="lucide:shield-check" title="DuckDB 1.4 或更新">
+基于 DuckDB 的 C 扩展 API 构建，一个二进制就能加载进 DuckDB 1.4 及之后的版本，不需要重新编译。
+</dfk-feature>
+
+<dfk-feature icon="lucide:play" title="例子就地能跑">
+本站每个例子都在你的浏览器里用 DuckDB-Wasm 真跑 —— 在函数页点一下「执行」就能看到真实结果。
+</dfk-feature>
+
+<dfk-feature icon="lucide:scale" title="MIT 许可">
+以 MIT 许可开源：源码、测试与这些页面都在仓库里。
+</dfk-feature>
+
+</dfk-features>
+
+<section className={styles.sectionTint}>
+<div className={styles.sectionInner}>
+
+## 装一次，之后就在 SQL 里调用
+
+扩展加的就是一批普通的 SQL 函数，调用处不用 import 任何东西。左边装一次，右边就能在任何能写 DuckDB 函数的地方用它。
+
+<div className={styles.codeGrid}>
+
+```sql title="duckdb"
+-- once per installation, then once per session
+INSTALL my_extension FROM community;
+LOAD my_extension;
+```
+
+<div className={styles.codeColumn}>
+
+```sql title="duckdb"
+SELECT my_greet_checked('world');  -- Hello, world!
+SELECT my_greet_checked('');       -- NULL
+SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE)) t(x);
+-- 4.0
+```
+
+注释就是每次调用的返回值 —— 最后一行是对两行数据真实求和的结果。
+
+</div>
+</div>
+
+<div className={styles.showcaseLinkRow}>
+<Link className={styles.showcaseLink} to="/docs/user-guide/functions">
+
+完整的函数参考
+
+<iconify-icon icon="lucide:arrow-right" className={styles.showcaseLinkArrow} aria-hidden="true" />
+
+</Link>
+</div>
+
+</div>
+</section>
+
+<dfk-next-steps section-title="接下来去哪">
+
+<dfk-step href="/docs/intro" title="简介">
+一页说清 my_extension 给 DuckDB 加了什么。
+</dfk-step>
+
+<dfk-step href="/docs/user-guide/installation" title="安装">
+社区仓、Release 文件，或者本地自己构建的产物。
+</dfk-step>
+
+<dfk-step href="/docs/user-guide/functions" title="函数">
+每个函数，配一个能就地跑的例子。
+</dfk-step>
+
+<dfk-step href="/docs/development/quick-start" title="开发指南">
+从源码构建、测试与发布这个扩展。
+</dfk-step>
+
+</dfk-next-steps>

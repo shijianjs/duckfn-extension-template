@@ -1,0 +1,129 @@
+---
+title: my_extension
+description: How to install and use this DuckDB extension, the functions it adds, and where its development guide lives.
+hide_table_of_contents: true
+wrapperClassName: dfk-home
+---
+
+import Link from '@docusaurus/Link';
+import {registerDfkElements} from 'duckfn-docs-kit';
+
+import styles from '@site/src/pages/index.module.css';
+
+{registerDfkElements()}
+
+{/* `MDXPage` supplies the `<Layout>` and the page grid; `dfk-home` is what
+    lets `src/css/home.css` give the page the full width it needs.
+
+    The badge `href`s carry the repository URL inline because an MDX page cannot
+    read `customFields`. Change them together with `REPO_URL` in
+    `docusaurus.config.ts` after cloning the template. */}
+
+<dfk-hero
+  logo-src="/img/logo.svg"
+  title="my_extension"
+  tagline="Extra SQL functions for DuckDB">
+
+<dfk-action kind="primary" href="/docs/user-guide/installation">Get started</dfk-action>
+
+<dfk-action kind="secondary" href="https://github.com/shijianjs/duckfn-extension-template" icon="simple-icons:github">GitHub</dfk-action>
+
+<dfk-badge href="https://duckdb.org" src="https://img.shields.io/badge/DuckDB-1.4%2B-fff100?logo=duckdb&style=flat" alt="DuckDB 1.4 or newer" />
+
+<dfk-badge href="https://duckdb.org/community_extensions/extensions/my_extension" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcommunity-extensions.duckdb.org%2Fdownloads-last-week.json&query=%24.my_extension&label=Weekly%20Downloads&color=blue&logo=duckdb&logoColor=a899ff&style=flat" alt="Weekly downloads from the DuckDB community extensions" />
+
+<dfk-badge href="https://github.com/shijianjs/duckfn-extension-template/releases" src="https://img.shields.io/github/v/release/shijianjs/duckfn-extension-template?style=flat&logo=github" alt="Latest release" />
+
+<dfk-badge href="https://github.com/shijianjs/duckfn-extension-template/blob/main/LICENSE" src="https://img.shields.io/badge/license-MIT-14459b.svg?style=flat&logo=github" alt="MIT license" />
+
+</dfk-hero>
+
+<dfk-features section-title="What my_extension gives you">
+
+<dfk-feature icon="lucide:braces" title="Call it from SQL">
+my_greet, my_greet_checked and my_sum are ordinary DuckDB functions: use them in any query, alongside DuckDB's own, with nothing to import.
+</dfk-feature>
+
+<dfk-feature icon="lucide:package" title="Install in one line">
+INSTALL my_extension FROM community; then LOAD my_extension; — signed builds matched to your DuckDB version and platform, so no -unsigned flag is needed.
+</dfk-feature>
+
+<dfk-feature icon="lucide:monitor-down" title="Every platform, on every release">
+Each version attaches one .duckdb_extension per platform to a GitHub Release, and LOAD takes a file straight from its URL — no download step in between.
+</dfk-feature>
+
+<dfk-feature icon="lucide:shield-check" title="DuckDB 1.4 or newer">
+Built against DuckDB's C extension API, so one binary loads into DuckDB 1.4 and later without a recompile.
+</dfk-feature>
+
+<dfk-feature icon="lucide:play" title="Examples that run here">
+Every example on this site runs in your browser through DuckDB-Wasm — click Run on the function reference and see the real result.
+</dfk-feature>
+
+<dfk-feature icon="lucide:scale" title="MIT licensed">
+Open source under the MIT license: the source, the tests and these pages all live in the repository.
+</dfk-feature>
+
+</dfk-features>
+
+<section className={styles.sectionTint}>
+<div className={styles.sectionInner}>
+
+## Install once, then call it from SQL
+
+The extension adds ordinary SQL functions, with nothing to import at the call site. Install it once (left), then use the functions anywhere a DuckDB function is allowed (right).
+
+<div className={styles.codeGrid}>
+
+```sql title="duckdb"
+-- once per installation, then once per session
+INSTALL my_extension FROM community;
+LOAD my_extension;
+```
+
+<div className={styles.codeColumn}>
+
+```sql title="duckdb"
+SELECT my_greet_checked('world');  -- Hello, world!
+SELECT my_greet_checked('');       -- NULL
+SELECT my_sum(x) FROM (VALUES (1.5::DOUBLE), (2.5::DOUBLE)) t(x);
+-- 4.0
+```
+
+The comments are what each call returns — and the last one is a real sum over two rows.
+
+</div>
+</div>
+
+<div className={styles.showcaseLinkRow}>
+<Link className={styles.showcaseLink} to="/docs/user-guide/functions">
+
+The full function reference
+
+<iconify-icon icon="lucide:arrow-right" className={styles.showcaseLinkArrow} aria-hidden="true" />
+
+</Link>
+</div>
+
+</div>
+</section>
+
+<dfk-next-steps section-title="Where to go next">
+
+<dfk-step href="/docs/intro" title="Introduction">
+What my_extension adds to DuckDB, in one page.
+</dfk-step>
+
+<dfk-step href="/docs/user-guide/installation" title="Installation">
+The community repository, a release file, or a local build.
+</dfk-step>
+
+<dfk-step href="/docs/user-guide/functions" title="Functions">
+Every function, with an example you can run right here.
+</dfk-step>
+
+<dfk-step href="/docs/development/quick-start" title="Development guide">
+Building, testing and releasing the extension from source.
+</dfk-step>
+
+</dfk-next-steps>
